@@ -2,7 +2,7 @@
 import numpy as np
 from numpy.linalg import inv
 import matplotlib.pyplot as plt
-
+import datetime
 class DSGD:
     def __init__(self, num_factor, step_size, max_iter, lambd) -> None:
         self.step_size = step_size
@@ -59,6 +59,7 @@ class DSGD:
         return int(np.floor(index/np.ceil(blockSize)))+1
 
     def train(self, sc, originRDD, trainRDD, testRDD):
+        t0 = datetime.datetime.now()
         self.train_rmse_arr = []
         self.test_rmse_arr = []
         numFactors = self.num_factor
@@ -121,16 +122,30 @@ class DSGD:
             # print("MSE/update for {}-th iteration is: {}/{} ".format(it, mse.value, nUpdates.value))
             # print("RMSE: {}".format(rmse))
             # print("Global RMSE: {}".format(train_rmse))
+        self.time_cost = datetime.datetime.now() - t0
     def get_train_rmse(self):
-        return self.train_rmse_arr
+        return self.train_rmse_arr[-1]
 
     def get_test_rmse(self):
-        return self.test_rmse_arr
-    def plot_rmse(self):
-        plt.plot(self.get_train_rmse(), label="train loss")
-        plt.plot(self.get_test_rmse(), label="test loss")
+        return self.test_rmse_arr[-1]
+
+    def get_time_cost(self):
+        return self.time_cost
+
+    def plot_rmse(self, title=f'DSGD model'):
+        plt.plot(self.train_rmse_arr, label="train loss")
+        plt.plot(self.test_rmse_arr, label="test loss")
+        plt.title(title)
         plt.legend()
         plt.show()
+
+    def save_plot_rmse(self, title):
+        plt.plot(self.train_rmse_arr, label="train loss")
+        plt.plot(self.test_rmse_arr, label="test loss")
+        plt.title(title)
+        plt.legend()
+        plt.savefig(f'plot/{title}.png')
+        plt.close()
 
 class ALS:
     def __init__(self, num_factor, max_iter, lambd) -> None:
@@ -160,6 +175,7 @@ class ALS:
         return (rating - pred)**2
 
     def train(self, sc, originRDD, trainRDD, testRDD):
+        t0 = datetime.datetime.now()
         numFactors = self.num_factor
         self.train_rmse_arr = []
         self.test_rmse_arr = []
@@ -213,15 +229,25 @@ class ALS:
             # print("Iteration %d:" % i)
             # print("\nRMSE: %5.4f\n" % train_rmse)
             # print("\nRMSE: %5.4f\n" % test_rmse)
+        self.time_cost = datetime.datetime.now() - t0
     def get_train_rmse(self):
-        return self.train_rmse_arr
+        return self.train_rmse_arr[-1]
 
     def get_test_rmse(self):
-        return self.test_rmse_arr
+        return self.test_rmse_arr[-1]
+    def get_time_cost(self):
+        return self.time_cost
 
-
-    def plot_rmse(self):
-        plt.plot(self.get_train_rmse(), label="train loss")
-        plt.plot(self.get_test_rmse(), label="test loss")
+    def plot_rmse(self, title="ALS model"):
+        plt.plot(self.train_rmse_arr, label="train loss")
+        plt.plot(self.test_rmse_arr, label="test loss")
+        plt.title(title)
         plt.legend()
         plt.show()
+    def save_plot_rmse(self, title):
+        plt.plot(self.train_rmse_arr, label="train loss")
+        plt.plot(self.test_rmse_arr, label="test loss")
+        plt.title(title)
+        plt.legend()
+        plt.savefig(f'plot/{title}.png')
+        plt.close()
