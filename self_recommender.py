@@ -118,9 +118,9 @@ class DSGD:
 
             self.train_rmse_arr.append(train_rmse)
             self.test_rmse_arr.append(test_rmse)
-            print("MSE/update for {}-th iteration is: {}/{} ".format(it, mse.value, nUpdates.value))
-            print("RMSE: {}".format(rmse))
-            print("Global RMSE: {}".format(train_rmse))
+            # print("MSE/update for {}-th iteration is: {}/{} ".format(it, mse.value, nUpdates.value))
+            # print("RMSE: {}".format(rmse))
+            # print("Global RMSE: {}".format(train_rmse))
     def get_train_rmse(self):
         return self.train_rmse_arr
 
@@ -143,18 +143,17 @@ class ALS:
     
     def computeOptimizeMatrix(self, iterables, constant_matrix_broadcast, lamb):
         fixed_matrix = constant_matrix_broadcast.value
-        num_factors = fixed_matrix.shape[0]
         iter_dict = dict(iterables)
-        X = fixed_matrix[:, list(iter_dict.keys())]
-        R = np.matrix(list(iter_dict.values()))
-        XtX = X.dot(X.T)
-        RX = X.dot(R.T)
-        return np.linalg.solve(XtX + lamb.value * np.eye(num_factors),RX)
-
-    def get_rmse(self, R, w, h, sorted_users, sorted_items):
-        sse = R.map(lambda x: self.get_error_square(x[2], w,h, sorted_users[x[0]], sorted_items[x[2]]) ).reduce(lambda x,y: x+y)
+        #X = np.array([fixed_matrix[k] for k in iter_dict.keys()])
+        X = fixed_matrix[list(iter_dict.keys()), :]
+        R = np.array(list(iter_dict.values()))
+        XtX = X.T.dot(X)
+        RX = (R).dot(X)
+        return np.linalg.solve(XtX + lamb.value * np.eye(self.num_factor), RX)
+    def get_rmse(self, R, w, h):
+        sse = R.map(lambda x: (x[2]- w[x[0]].dot(h[x[1]].T))**2).reduce(lambda x,y: x+y)
         count = R.count()
-        rmse = pow(sse/count, 0.5)
+        rmse = pow((sse/count), 0.5)
         return rmse
     def get_error_square(self, rating, w, h, i, j):
         pred = w[:, [i]].T.dot(h[:, [j]])[0, 0]
@@ -162,6 +161,9 @@ class ALS:
 
     def train(self, sc, originRDD, trainRDD, testRDD):
         numFactors = self.num_factor
+        self.train_rmse_arr = []
+        self.test_rmse_arr = []
+
         sorted_users = dict(originRDD.map(lambda x: x[0]).distinct().sortBy(lambda idx: idx, ascending = True)\
             .zipWithIndex().collect())
 
@@ -170,43 +172,56 @@ class ALS:
 
         item_count = len(sorted_items)
         user_count = len(sorted_users)
-        M = trainRDD.map(lambda l: (l[0], (l[1], l[2])))\
-            .map(lambda x: (self.getRelativeIndex(x[0], sorted_users), (self.getRelativeIndex(x[1][0], sorted_items), x[1][1])))
+        M = trainRDD.map(lambda x: (self.getRelativeIndex(x[0], sorted_users), self.getRelativeIndex(x[1], sorted_items), x[2]))        
         
-        W = np.matrix(np.random.rand(numFactors, user_count))
-        H = np.matrix(np.random.rand(numFactors, item_count))
+        W = np.random.rand(user_count, self.num_factor)
+        H = np.random.rand(item_count, self.num_factor)
 
-        R_u = M.map(lambda x: (x[0], (x[1][0], x[1][1]))).cache()
-        R_i = M.map(lambda x: (x[1][0], (x[0], x[1][1]))).cache()
+        R_u = M.map(lambda x: (x[0], (x[1], x[2]))).groupByKey().cache()
+        R_i = M.map(lambda x: (x[1], (x[0], x[2]))).groupByKey().cache()
 
         w_broadcast = sc.broadcast(W)
         h_broadcast = sc.broadcast(H)
         lambda_broadcast = sc.broadcast(self.lambd)
-        print(w_broadcast.value.shape)
-        print(h_broadcast.value.shape)
+
         for i in range(self.max_iter):
-            newW = dict(R_u.groupByKey()\
+            newW = dict(R_u\
                 .mapValues(lambda row:self.computeOptimizeMatrix(row,h_broadcast,lambda_broadcast))\
                 .sortByKey()\
+                #.mapValues(lambda x: list(np.array(x)[0]))\
                 .collect())
-            for key, val in newW.items():
-                W[:, key] = val[:,0]
-            #W = np.array(list(map(lambda x: np.array(x.flatten())[0], newW))).T
-            w_broadcast.destroy()
+            W = np.array([newW.get(i, val) for i, val in enumerate(W) ])
+            #w_broadcast.destroy()
             w_broadcast = sc.broadcast(W)
-            newH = dict(R_i.groupByKey()\
-                .mapValues(lambda row: self.computeOptimizeMatrix(row,w_broadcast, lambda_broadcast))\
+            newH = dict(R_i\
+                .mapValues(lambda row: self.computeOptimizeMatrix(row,w_broadcast,lambda_broadcast))\
                 .sortByKey()\
+                #.mapValues(lambda x: list(np.array(x)[0]))\
                 .collect())
-            for key, val in newH.items():
-                H[:, key] = val[:,0]
-            #H = np.array(list(map(lambda x: np.array(x.flatten())[0], newH))).T
-            h_broadcast.destroy()
+            H = np.array([newH.get(i, val) for i, val in enumerate(H) ])
+            #h_broadcast.destroy()
             h_broadcast = sc.broadcast(H)
-            
-            # sse = M.map(lambda x: get_error_square(x[1][1], x[0], x[1][0])).reduce(lambda x,y: x+y)[0,0]
-            # count = M.count()
-            # mse = pow((sse/count), 0.5)
-            rmse = self.get_rmse(trainRDD, W, H, sorted_users, sorted_items)
-            print("Iteration %d:" % i)
-            print("\nRMSE: %5.4f\n" % rmse)
+            train_rmse = self.get_rmse(M, W, H)
+            train_users = M.map(lambda x: x[0]).distinct().collect()
+            train_items = M.map(lambda x: x[1]).distinct().collect()
+            processed_testRDD = testRDD\
+                .map(lambda x: (self.getRelativeIndex(x[0], sorted_users), self.getRelativeIndex(x[1], sorted_items), x[2]))\
+                .filter(lambda x: x[0] in train_users and x[1] in train_items)
+            test_rmse = self.get_rmse(processed_testRDD, W, H)
+            self.train_rmse_arr.append(train_rmse)
+            self.test_rmse_arr.append(test_rmse)
+            # print("Iteration %d:" % i)
+            # print("\nRMSE: %5.4f\n" % train_rmse)
+            # print("\nRMSE: %5.4f\n" % test_rmse)
+    def get_train_rmse(self):
+        return self.train_rmse_arr
+
+    def get_test_rmse(self):
+        return self.test_rmse_arr
+
+
+    def plot_rmse(self):
+        plt.plot(self.get_train_rmse(), label="train loss")
+        plt.plot(self.get_test_rmse(), label="test loss")
+        plt.legend()
+        plt.show()
