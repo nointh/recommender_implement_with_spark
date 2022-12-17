@@ -1,0 +1,148 @@
+[2022-12-17 10:18:00,883] {processor.py:153} INFO - Started process (PID=179) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:18:00,883] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:18:00,884] {logging_mixin.py:115} INFO - [2022-12-17 10:18:00,884] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:18:05,973] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:18:06,086] {logging_mixin.py:115} INFO - [2022-12-17 10:18:06,086] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:18:06,163] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 5.285 seconds
+[2022-12-17 10:18:36,451] {processor.py:153} INFO - Started process (PID=237) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:18:36,452] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:18:36,452] {logging_mixin.py:115} INFO - [2022-12-17 10:18:36,452] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:18:37,108] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:18:37,132] {logging_mixin.py:115} INFO - [2022-12-17 10:18:37,131] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:18:37,167] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.719 seconds
+[2022-12-17 10:19:07,305] {processor.py:153} INFO - Started process (PID=274) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:19:07,305] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:19:07,306] {logging_mixin.py:115} INFO - [2022-12-17 10:19:07,306] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:19:07,978] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:19:08,002] {logging_mixin.py:115} INFO - [2022-12-17 10:19:08,002] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:19:08,038] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.738 seconds
+[2022-12-17 10:19:38,619] {processor.py:153} INFO - Started process (PID=320) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:19:38,620] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:19:38,620] {logging_mixin.py:115} INFO - [2022-12-17 10:19:38,620] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:19:39,278] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:19:39,303] {logging_mixin.py:115} INFO - [2022-12-17 10:19:39,303] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:19:39,339] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.723 seconds
+[2022-12-17 10:20:09,479] {processor.py:153} INFO - Started process (PID=366) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:20:09,480] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:20:09,481] {logging_mixin.py:115} INFO - [2022-12-17 10:20:09,480] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:20:10,137] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:20:10,160] {logging_mixin.py:115} INFO - [2022-12-17 10:20:10,160] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:20:10,194] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.719 seconds
+[2022-12-17 10:20:40,300] {processor.py:153} INFO - Started process (PID=411) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:20:40,301] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:20:40,302] {logging_mixin.py:115} INFO - [2022-12-17 10:20:40,302] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:20:41,043] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:20:41,069] {logging_mixin.py:115} INFO - [2022-12-17 10:20:41,069] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:20:41,109] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.813 seconds
+[2022-12-17 10:21:11,619] {processor.py:153} INFO - Started process (PID=449) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:21:11,620] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:21:11,621] {logging_mixin.py:115} INFO - [2022-12-17 10:21:11,621] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:21:12,251] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:21:12,274] {logging_mixin.py:115} INFO - [2022-12-17 10:21:12,274] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:21:12,310] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.694 seconds
+[2022-12-17 10:21:42,576] {processor.py:153} INFO - Started process (PID=495) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:21:42,577] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:21:42,578] {logging_mixin.py:115} INFO - [2022-12-17 10:21:42,578] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:21:43,196] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:21:43,219] {logging_mixin.py:115} INFO - [2022-12-17 10:21:43,218] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:21:43,255] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.683 seconds
+[2022-12-17 10:22:13,721] {processor.py:153} INFO - Started process (PID=540) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:22:13,721] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:22:13,722] {logging_mixin.py:115} INFO - [2022-12-17 10:22:13,722] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:22:14,334] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:22:14,357] {logging_mixin.py:115} INFO - [2022-12-17 10:22:14,357] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:22:14,394] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.677 seconds
+[2022-12-17 10:22:44,749] {processor.py:153} INFO - Started process (PID=575) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:22:44,750] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:22:44,751] {logging_mixin.py:115} INFO - [2022-12-17 10:22:44,751] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:22:45,361] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:22:45,384] {logging_mixin.py:115} INFO - [2022-12-17 10:22:45,384] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:22:45,421] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.675 seconds
+[2022-12-17 10:23:15,817] {processor.py:153} INFO - Started process (PID=638) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:23:15,819] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:23:15,820] {logging_mixin.py:115} INFO - [2022-12-17 10:23:15,820] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:23:16,743] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:23:16,766] {logging_mixin.py:115} INFO - [2022-12-17 10:23:16,766] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:23:16,820] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 1.010 seconds
+[2022-12-17 10:23:46,931] {processor.py:153} INFO - Started process (PID=683) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:23:46,931] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:23:46,932] {logging_mixin.py:115} INFO - [2022-12-17 10:23:46,932] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:23:47,643] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:23:47,666] {logging_mixin.py:115} INFO - [2022-12-17 10:23:47,666] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:23:47,703] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.778 seconds
+[2022-12-17 10:24:17,886] {processor.py:153} INFO - Started process (PID=718) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:24:17,887] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:24:17,887] {logging_mixin.py:115} INFO - [2022-12-17 10:24:17,887] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:24:18,597] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:24:18,621] {logging_mixin.py:115} INFO - [2022-12-17 10:24:18,621] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:24:18,658] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.777 seconds
+[2022-12-17 10:24:48,750] {processor.py:153} INFO - Started process (PID=765) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:24:48,751] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:24:48,752] {logging_mixin.py:115} INFO - [2022-12-17 10:24:48,752] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:24:49,430] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:24:49,454] {logging_mixin.py:115} INFO - [2022-12-17 10:24:49,453] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:24:49,490] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.745 seconds
+[2022-12-17 10:25:19,628] {processor.py:153} INFO - Started process (PID=811) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:25:19,629] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:25:19,629] {logging_mixin.py:115} INFO - [2022-12-17 10:25:19,629] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:25:20,367] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:25:20,399] {logging_mixin.py:115} INFO - [2022-12-17 10:25:20,398] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:25:20,444] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.820 seconds
+[2022-12-17 10:25:50,530] {processor.py:153} INFO - Started process (PID=846) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:25:50,531] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:25:50,531] {logging_mixin.py:115} INFO - [2022-12-17 10:25:50,531] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:25:51,406] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:25:51,443] {logging_mixin.py:115} INFO - [2022-12-17 10:25:51,443] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:25:51,492] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.967 seconds
+[2022-12-17 10:26:21,618] {processor.py:153} INFO - Started process (PID=898) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:26:21,619] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:26:21,620] {logging_mixin.py:115} INFO - [2022-12-17 10:26:21,620] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:26:22,405] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:26:22,429] {logging_mixin.py:115} INFO - [2022-12-17 10:26:22,429] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:26:22,472] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.858 seconds
+[2022-12-17 10:26:53,050] {processor.py:153} INFO - Started process (PID=943) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:26:53,051] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:26:53,052] {logging_mixin.py:115} INFO - [2022-12-17 10:26:53,051] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:26:53,886] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:26:53,931] {logging_mixin.py:115} INFO - [2022-12-17 10:26:53,931] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:26:54,009] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.965 seconds
+[2022-12-17 10:27:24,136] {processor.py:153} INFO - Started process (PID=979) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:27:24,136] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:27:24,137] {logging_mixin.py:115} INFO - [2022-12-17 10:27:24,137] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:27:24,848] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:27:24,872] {logging_mixin.py:115} INFO - [2022-12-17 10:27:24,872] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:27:24,915] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.784 seconds
+[2022-12-17 10:27:55,396] {processor.py:153} INFO - Started process (PID=1024) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:27:55,397] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:27:55,397] {logging_mixin.py:115} INFO - [2022-12-17 10:27:55,397] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:27:56,055] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:27:56,081] {logging_mixin.py:115} INFO - [2022-12-17 10:27:56,080] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:27:56,132] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.741 seconds
+[2022-12-17 10:28:26,682] {processor.py:153} INFO - Started process (PID=1079) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:28:26,682] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:28:26,683] {logging_mixin.py:115} INFO - [2022-12-17 10:28:26,683] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:28:27,444] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:28:27,466] {logging_mixin.py:115} INFO - [2022-12-17 10:28:27,466] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:28:27,491] {logging_mixin.py:115} INFO - [2022-12-17 10:28:27,491] {dag.py:2972} INFO - Setting next_dagrun for create_data_warehouse_dag to 2022-12-17T00:00:00+00:00, run_after=2022-12-18T00:00:00+00:00
+[2022-12-17 10:28:27,504] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.827 seconds
+[2022-12-17 10:28:58,076] {processor.py:153} INFO - Started process (PID=1115) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:28:58,076] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:28:58,077] {logging_mixin.py:115} INFO - [2022-12-17 10:28:58,077] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:28:58,725] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:28:58,748] {logging_mixin.py:115} INFO - [2022-12-17 10:28:58,747] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:28:58,772] {logging_mixin.py:115} INFO - [2022-12-17 10:28:58,772] {dag.py:2972} INFO - Setting next_dagrun for create_data_warehouse_dag to 2022-12-17T00:00:00+00:00, run_after=2022-12-18T00:00:00+00:00
+[2022-12-17 10:28:58,785] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.713 seconds
+[2022-12-17 10:29:29,027] {processor.py:153} INFO - Started process (PID=1159) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:29:29,028] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:29:29,028] {logging_mixin.py:115} INFO - [2022-12-17 10:29:29,028] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:29:29,678] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:29:29,702] {logging_mixin.py:115} INFO - [2022-12-17 10:29:29,701] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:29:29,748] {logging_mixin.py:115} INFO - [2022-12-17 10:29:29,748] {dag.py:2972} INFO - Setting next_dagrun for create_data_warehouse_dag to 2022-12-17T00:00:00+00:00, run_after=2022-12-18T00:00:00+00:00
+[2022-12-17 10:29:29,763] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 0.739 seconds
+[2022-12-17 10:49:18,346] {processor.py:153} INFO - Started process (PID=176) to work on /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:49:18,347] {processor.py:641} INFO - Processing file /opt/airflow/dags/data_warehouse.py for tasks to queue
+[2022-12-17 10:49:18,348] {logging_mixin.py:115} INFO - [2022-12-17 10:49:18,348] {dagbag.py:508} INFO - Filling up the DagBag from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:49:21,614] {processor.py:651} INFO - DAG(s) dict_keys(['create_data_warehouse_dag']) retrieved from /opt/airflow/dags/data_warehouse.py
+[2022-12-17 10:49:21,700] {logging_mixin.py:115} INFO - [2022-12-17 10:49:21,700] {dag.py:2420} INFO - Sync 1 DAGs
+[2022-12-17 10:49:21,763] {logging_mixin.py:115} INFO - [2022-12-17 10:49:21,763] {dag.py:2972} INFO - Setting next_dagrun for create_data_warehouse_dag to 2022-12-17T00:00:00+00:00, run_after=2022-12-18T00:00:00+00:00
+[2022-12-17 10:49:21,784] {processor.py:161} INFO - Processing /opt/airflow/dags/data_warehouse.py took 3.442 seconds

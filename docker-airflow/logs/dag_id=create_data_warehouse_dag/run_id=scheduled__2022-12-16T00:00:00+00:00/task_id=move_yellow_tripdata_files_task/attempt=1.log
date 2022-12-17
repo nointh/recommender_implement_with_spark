@@ -1,0 +1,52 @@
+[2022-12-17 10:23:15,467] {taskinstance.py:1179} INFO - Dependencies all met for <TaskInstance: create_data_warehouse_dag.move_yellow_tripdata_files_task scheduled__2022-12-16T00:00:00+00:00 [queued]>
+[2022-12-17 10:23:15,487] {taskinstance.py:1179} INFO - Dependencies all met for <TaskInstance: create_data_warehouse_dag.move_yellow_tripdata_files_task scheduled__2022-12-16T00:00:00+00:00 [queued]>
+[2022-12-17 10:23:15,488] {taskinstance.py:1376} INFO - 
+--------------------------------------------------------------------------------
+[2022-12-17 10:23:15,488] {taskinstance.py:1377} INFO - Starting attempt 1 of 2
+[2022-12-17 10:23:15,488] {taskinstance.py:1378} INFO - 
+--------------------------------------------------------------------------------
+[2022-12-17 10:23:15,507] {taskinstance.py:1397} INFO - Executing <Task(GCSToGCSOperator): move_yellow_tripdata_files_task> on 2022-12-16 00:00:00+00:00
+[2022-12-17 10:23:15,513] {standard_task_runner.py:52} INFO - Started process 635 to run task
+[2022-12-17 10:23:15,517] {standard_task_runner.py:79} INFO - Running: ['airflow', 'tasks', 'run', 'create_data_warehouse_dag', 'move_yellow_tripdata_files_task', 'scheduled__2022-12-16T00:00:00+00:00', '--job-id', '75', '--raw', '--subdir', 'DAGS_FOLDER/data_warehouse.py', '--cfg-path', '/tmp/tmp8dezgiuy', '--error-file', '/tmp/tmp5pkyt04h']
+[2022-12-17 10:23:15,518] {standard_task_runner.py:80} INFO - Job 75: Subtask move_yellow_tripdata_files_task
+[2022-12-17 10:23:15,607] {task_command.py:371} INFO - Running <TaskInstance: create_data_warehouse_dag.move_yellow_tripdata_files_task scheduled__2022-12-16T00:00:00+00:00 [running]> on host e615f6023906
+[2022-12-17 10:23:15,760] {taskinstance.py:1591} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_OWNER=airflow
+AIRFLOW_CTX_DAG_ID=create_data_warehouse_dag
+AIRFLOW_CTX_TASK_ID=move_yellow_tripdata_files_task
+AIRFLOW_CTX_EXECUTION_DATE=2022-12-16T00:00:00+00:00
+AIRFLOW_CTX_TRY_NUMBER=1
+AIRFLOW_CTX_DAG_RUN_ID=scheduled__2022-12-16T00:00:00+00:00
+[2022-12-17 10:23:15,762] {crypto.py:82} WARNING - empty cryptography key - values will not be stored encrypted.
+[2022-12-17 10:23:15,762] {base.py:68} INFO - Using connection ID 'google_cloud_default' for task execution.
+[2022-12-17 10:23:15,763] {gcs_to_gcs.py:243} WARNING - destination_bucket is None. Defaulting it to source_bucket (dtc_data_lake_taxi-data-de-project)
+[2022-12-17 10:23:15,763] {gcs_to_gcs.py:367} INFO - Delimiter ignored because wildcard is in prefix
+[2022-12-17 10:23:15,763] {taskinstance.py:1909} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/providers/google/cloud/transfers/gcs_to_gcs.py", line 258, in execute
+    self._copy_source_with_wildcard(hook=hook, prefix=prefix)
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/providers/google/cloud/transfers/gcs_to_gcs.py", line 369, in _copy_source_with_wildcard
+    objects = hook.list(self.source_bucket, prefix=prefix_, delimiter=delimiter)
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/providers/google/cloud/hooks/gcs.py", line 698, in list
+    client = self.get_conn()
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/providers/google/cloud/hooks/gcs.py", line 160, in get_conn
+    credentials=self._get_credentials(), client_info=CLIENT_INFO, project=self.project_id
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/providers/google/common/hooks/base_google.py", line 268, in _get_credentials
+    credentials, _ = self._get_credentials_and_project_id()
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/providers/google/common/hooks/base_google.py", line 254, in _get_credentials_and_project_id
+    delegates=delegates,
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/providers/google/cloud/utils/credentials_provider.py", line 332, in get_credentials_and_project_id
+    return _CredentialProvider(*args, **kwargs).get_credentials_and_project()
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/providers/google/cloud/utils/credentials_provider.py", line 231, in get_credentials_and_project
+    credentials, project_id = self._get_credentials_using_key_path()
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/providers/google/cloud/utils/credentials_provider.py", line 281, in _get_credentials_using_key_path
+    self.key_path, scopes=self.scopes
+  File "/home/airflow/.local/lib/python3.7/site-packages/google/oauth2/service_account.py", line 239, in from_service_account_file
+    filename, require=["client_email", "token_uri"]
+  File "/home/airflow/.local/lib/python3.7/site-packages/google/auth/_service_account_info.py", line 79, in from_filename
+    with io.open(filename, "r", encoding="utf-8") as json_file:
+FileNotFoundError: [Errno 2] No such file or directory: '/.google/credentials/google_credentials.json'
+[2022-12-17 10:23:15,778] {taskinstance.py:1420} INFO - Marking task as UP_FOR_RETRY. dag_id=create_data_warehouse_dag, task_id=move_yellow_tripdata_files_task, execution_date=20221216T000000, start_date=20221217T102315, end_date=20221217T102315
+[2022-12-17 10:23:16,012] {standard_task_runner.py:97} ERROR - Failed to execute job 75 for task move_yellow_tripdata_files_task ([Errno 2] No such file or directory: '/.google/credentials/google_credentials.json'; 635)
+[2022-12-17 10:23:16,049] {local_task_job.py:156} INFO - Task exited with return code 1
+[2022-12-17 10:23:16,185] {local_task_job.py:273} INFO - 0 downstream tasks scheduled from follow-on schedule check
