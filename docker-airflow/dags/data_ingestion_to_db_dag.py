@@ -55,6 +55,7 @@ def get_themoviedb_data(id):
     movie_data['languages'] = movie_data.get('spoken_languages', '')
     movie_data['genres'] = map(lambda x: x.get('name', ''), movie_data.get('genres', []))
     movie_data['releaseYear'] = movie_data.get('release_date', '')[:4]
+    return movie_data
 
 def load_and_scrap_movie_data():
     movies_df = pd.read_csv(f'{OUTPUT_FOlDER}/movies.csv', sep=',')
