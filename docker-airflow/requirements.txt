@@ -4,3 +4,4 @@ pandas
 # pyspark
 sqlalchemy
 psycopg2-binary
+requests
