@@ -1,0 +1,40 @@
+[2022-07-12 19:13:01,060] {taskinstance.py:1179} INFO - Dependencies all met for <TaskInstance: data_ingestion_local.convert_to_csv manual__2022-07-12T19:07:24.595810+00:00 [queued]>
+[2022-07-12 19:13:01,073] {taskinstance.py:1179} INFO - Dependencies all met for <TaskInstance: data_ingestion_local.convert_to_csv manual__2022-07-12T19:07:24.595810+00:00 [queued]>
+[2022-07-12 19:13:01,073] {taskinstance.py:1376} INFO - 
+--------------------------------------------------------------------------------
+[2022-07-12 19:13:01,074] {taskinstance.py:1377} INFO - Starting attempt 2 of 2
+[2022-07-12 19:13:01,074] {taskinstance.py:1378} INFO - 
+--------------------------------------------------------------------------------
+[2022-07-12 19:13:01,091] {taskinstance.py:1397} INFO - Executing <Task(PythonOperator): convert_to_csv> on 2022-07-12 19:07:24.595810+00:00
+[2022-07-12 19:13:01,096] {standard_task_runner.py:52} INFO - Started process 2556 to run task
+[2022-07-12 19:13:01,099] {standard_task_runner.py:79} INFO - Running: ['airflow', 'tasks', 'run', 'data_ingestion_local', 'convert_to_csv', 'manual__2022-07-12T19:07:24.595810+00:00', '--job-id', '8', '--raw', '--subdir', 'DAGS_FOLDER/data_ingestion_local_dag.py', '--cfg-path', '/tmp/tmpmjqpw27g', '--error-file', '/tmp/tmpw_exw5m3']
+[2022-07-12 19:13:01,100] {standard_task_runner.py:80} INFO - Job 8: Subtask convert_to_csv
+[2022-07-12 19:13:01,171] {task_command.py:371} INFO - Running <TaskInstance: data_ingestion_local.convert_to_csv manual__2022-07-12T19:07:24.595810+00:00 [running]> on host 139e0ae5bdf5
+[2022-07-12 19:13:01,224] {logging_mixin.py:115} WARNING - /home/airflow/.local/lib/python3.7/site-packages/airflow/utils/context.py:202 AirflowContextDeprecationWarning: Accessing 'execution_date' from the template is deprecated and will be removed in a future version. Please use 'data_interval_start' or 'logical_date' instead.
+[2022-07-12 19:13:01,271] {taskinstance.py:1591} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_OWNER=airflow
+AIRFLOW_CTX_DAG_ID=data_ingestion_local
+AIRFLOW_CTX_TASK_ID=convert_to_csv
+AIRFLOW_CTX_EXECUTION_DATE=2022-07-12T19:07:24.595810+00:00
+AIRFLOW_CTX_TRY_NUMBER=2
+AIRFLOW_CTX_DAG_RUN_ID=manual__2022-07-12T19:07:24.595810+00:00
+[2022-07-12 19:13:11,931] {logging_mixin.py:115} INFO - creating new csv file /opt/airflow/output_2022-04.csv
+[2022-07-12 19:13:12,806] {taskinstance.py:1909} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/operators/python.py", line 171, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/operators/python.py", line 189, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/data_ingestion_local_dag.py", line 33, in convert_to_csv_callable
+    df.write.option("header","true").csv(new_csv_file_name)
+  File "/home/airflow/.local/lib/python3.7/site-packages/pyspark/sql/readwriter.py", line 1240, in csv
+    self._jwrite.csv(path)
+  File "/home/airflow/.local/lib/python3.7/site-packages/py4j/java_gateway.py", line 1322, in __call__
+    answer, self.gateway_client, self.target_id, self.name)
+  File "/home/airflow/.local/lib/python3.7/site-packages/pyspark/sql/utils.py", line 196, in deco
+    raise converted from None
+pyspark.sql.utils.AnalysisException: path file:/opt/airflow/output_2022-04.csv already exists.
+[2022-07-12 19:13:12,845] {taskinstance.py:1420} INFO - Marking task as FAILED. dag_id=data_ingestion_local, task_id=convert_to_csv, execution_date=20220712T190724, start_date=20220712T191301, end_date=20220712T191312
+[2022-07-12 19:13:12,867] {standard_task_runner.py:97} ERROR - Failed to execute job 8 for task convert_to_csv (path file:/opt/airflow/output_2022-04.csv already exists.; 2556)
+[2022-07-12 19:13:12,906] {local_task_job.py:156} INFO - Task exited with return code 1
+[2022-07-12 19:13:12,987] {local_task_job.py:273} INFO - 0 downstream tasks scheduled from follow-on schedule check

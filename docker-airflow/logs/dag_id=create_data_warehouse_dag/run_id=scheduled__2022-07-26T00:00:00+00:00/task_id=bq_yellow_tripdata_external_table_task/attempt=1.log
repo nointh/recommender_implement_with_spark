@@ -1,0 +1,44 @@
+[2022-07-27 09:05:30,203] {taskinstance.py:1179} INFO - Dependencies all met for <TaskInstance: create_data_warehouse_dag.bq_yellow_tripdata_external_table_task scheduled__2022-07-26T00:00:00+00:00 [queued]>
+[2022-07-27 09:05:30,239] {taskinstance.py:1179} INFO - Dependencies all met for <TaskInstance: create_data_warehouse_dag.bq_yellow_tripdata_external_table_task scheduled__2022-07-26T00:00:00+00:00 [queued]>
+[2022-07-27 09:05:30,239] {taskinstance.py:1376} INFO - 
+--------------------------------------------------------------------------------
+[2022-07-27 09:05:30,239] {taskinstance.py:1377} INFO - Starting attempt 1 of 2
+[2022-07-27 09:05:30,240] {taskinstance.py:1378} INFO - 
+--------------------------------------------------------------------------------
+[2022-07-27 09:05:30,308] {taskinstance.py:1397} INFO - Executing <Task(BigQueryCreateExternalTableOperator): bq_yellow_tripdata_external_table_task> on 2022-07-26 00:00:00+00:00
+[2022-07-27 09:05:30,346] {standard_task_runner.py:52} INFO - Started process 1264 to run task
+[2022-07-27 09:05:30,373] {standard_task_runner.py:79} INFO - Running: ['airflow', 'tasks', 'run', 'create_data_warehouse_dag', 'bq_yellow_tripdata_external_table_task', 'scheduled__2022-07-26T00:00:00+00:00', '--job-id', '7', '--raw', '--subdir', 'DAGS_FOLDER/data_warehouse.py', '--cfg-path', '/tmp/tmpe5nq7em0', '--error-file', '/tmp/tmp8lofvdcj']
+[2022-07-27 09:05:30,376] {standard_task_runner.py:80} INFO - Job 7: Subtask bq_yellow_tripdata_external_table_task
+[2022-07-27 09:05:30,678] {task_command.py:371} INFO - Running <TaskInstance: create_data_warehouse_dag.bq_yellow_tripdata_external_table_task scheduled__2022-07-26T00:00:00+00:00 [running]> on host 11c7f62524ed
+[2022-07-27 09:05:31,032] {taskinstance.py:1591} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_OWNER=airflow
+AIRFLOW_CTX_DAG_ID=create_data_warehouse_dag
+AIRFLOW_CTX_TASK_ID=bq_yellow_tripdata_external_table_task
+AIRFLOW_CTX_EXECUTION_DATE=2022-07-26T00:00:00+00:00
+AIRFLOW_CTX_TRY_NUMBER=1
+AIRFLOW_CTX_DAG_RUN_ID=scheduled__2022-07-26T00:00:00+00:00
+[2022-07-27 09:05:31,034] {crypto.py:82} WARNING - empty cryptography key - values will not be stored encrypted.
+[2022-07-27 09:05:31,035] {base.py:68} INFO - Using connection ID 'google_cloud_default' for task execution.
+[2022-07-27 09:05:31,694] {taskinstance.py:1909} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/providers/google/cloud/operators/bigquery.py", line 1123, in execute
+    table_resource=self.table_resource,
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/providers/google/common/hooks/base_google.py", line 457, in inner_wrapper
+    return func(self, *args, **kwargs)
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/providers/google/cloud/hooks/bigquery.py", line 401, in create_empty_table
+    table=table, exists_ok=exists_ok, retry=retry
+  File "/home/airflow/.local/lib/python3.7/site-packages/google/cloud/bigquery/client.py", line 755, in create_table
+    timeout=timeout,
+  File "/home/airflow/.local/lib/python3.7/site-packages/google/cloud/bigquery/client.py", line 782, in _call_api
+    return call()
+  File "/home/airflow/.local/lib/python3.7/site-packages/google/api_core/retry.py", line 288, in retry_wrapped_func
+    on_error=on_error,
+  File "/home/airflow/.local/lib/python3.7/site-packages/google/api_core/retry.py", line 190, in retry_target
+    return target()
+  File "/home/airflow/.local/lib/python3.7/site-packages/google/cloud/_http/__init__.py", line 494, in api_request
+    raise exceptions.from_http_response(response)
+google.api_core.exceptions.BadRequest: 400 POST https://bigquery.googleapis.com/bigquery/v2/projects/taxi-data-de-project/datasets/trips_data_all/tables?prettyPrint=false: Invalid source URI: gs:/dtc_data_lake_taxi-data-de-project/yellow/*
+[2022-07-27 09:05:31,797] {taskinstance.py:1420} INFO - Marking task as UP_FOR_RETRY. dag_id=create_data_warehouse_dag, task_id=bq_yellow_tripdata_external_table_task, execution_date=20220726T000000, start_date=20220727T090530, end_date=20220727T090531
+[2022-07-27 09:05:31,857] {standard_task_runner.py:97} ERROR - Failed to execute job 7 for task bq_yellow_tripdata_external_table_task (400 POST https://bigquery.googleapis.com/bigquery/v2/projects/taxi-data-de-project/datasets/trips_data_all/tables?prettyPrint=false: Invalid source URI: gs:/dtc_data_lake_taxi-data-de-project/yellow/*; 1264)
+[2022-07-27 09:05:31,875] {local_task_job.py:156} INFO - Task exited with return code 1
+[2022-07-27 09:05:32,058] {local_task_job.py:273} INFO - 0 downstream tasks scheduled from follow-on schedule check

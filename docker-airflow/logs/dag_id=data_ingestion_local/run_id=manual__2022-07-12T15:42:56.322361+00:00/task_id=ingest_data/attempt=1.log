@@ -1,0 +1,27 @@
+[2022-07-12 15:43:07,781] {taskinstance.py:1179} INFO - Dependencies all met for <TaskInstance: data_ingestion_local.ingest_data manual__2022-07-12T15:42:56.322361+00:00 [queued]>
+[2022-07-12 15:43:07,797] {taskinstance.py:1179} INFO - Dependencies all met for <TaskInstance: data_ingestion_local.ingest_data manual__2022-07-12T15:42:56.322361+00:00 [queued]>
+[2022-07-12 15:43:07,797] {taskinstance.py:1376} INFO - 
+--------------------------------------------------------------------------------
+[2022-07-12 15:43:07,798] {taskinstance.py:1377} INFO - Starting attempt 1 of 2
+[2022-07-12 15:43:07,798] {taskinstance.py:1378} INFO - 
+--------------------------------------------------------------------------------
+[2022-07-12 15:43:07,828] {taskinstance.py:1397} INFO - Executing <Task(PythonOperator): ingest_data> on 2022-07-12 15:42:56.322361+00:00
+[2022-07-12 15:43:07,834] {standard_task_runner.py:52} INFO - Started process 1446 to run task
+[2022-07-12 15:43:07,839] {standard_task_runner.py:79} INFO - Running: ['airflow', 'tasks', 'run', 'data_ingestion_local', 'ingest_data', 'manual__2022-07-12T15:42:56.322361+00:00', '--job-id', '15', '--raw', '--subdir', 'DAGS_FOLDER/data_ingestion_local_dag.py', '--cfg-path', '/tmp/tmpkwe1p_p2', '--error-file', '/tmp/tmpkmdxme50']
+[2022-07-12 15:43:07,842] {standard_task_runner.py:80} INFO - Job 15: Subtask ingest_data
+[2022-07-12 15:43:07,942] {task_command.py:371} INFO - Running <TaskInstance: data_ingestion_local.ingest_data manual__2022-07-12T15:42:56.322361+00:00 [running]> on host 0ca5e21fb7fb
+[2022-07-12 15:43:08,017] {logging_mixin.py:115} WARNING - /home/airflow/.local/lib/python3.7/site-packages/airflow/utils/context.py:202 AirflowContextDeprecationWarning: Accessing 'execution_date' from the template is deprecated and will be removed in a future version. Please use 'data_interval_start' or 'logical_date' instead.
+[2022-07-12 15:43:08,087] {taskinstance.py:1591} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_OWNER=airflow
+AIRFLOW_CTX_DAG_ID=data_ingestion_local
+AIRFLOW_CTX_TASK_ID=ingest_data
+AIRFLOW_CTX_EXECUTION_DATE=2022-07-12T15:42:56.322361+00:00
+AIRFLOW_CTX_TRY_NUMBER=1
+AIRFLOW_CTX_DAG_RUN_ID=manual__2022-07-12T15:42:56.322361+00:00
+[2022-07-12 15:43:08,091] {logging_mixin.py:115} INFO - *** pass pgdatabase 5432 ny_taxi yellow_taxi_2022_04.parquet /opt/airflow/output_2022-04.parquet
+[2022-07-12 15:43:08,091] {logging_mixin.py:115} INFO - user is ***
+[2022-07-12 15:43:08,092] {logging_mixin.py:115} INFO - Completed
+[2022-07-12 15:43:08,092] {python.py:173} INFO - Done. Returned value was: None
+[2022-07-12 15:43:08,114] {taskinstance.py:1420} INFO - Marking task as SUCCESS. dag_id=data_ingestion_local, task_id=ingest_data, execution_date=20220712T154256, start_date=20220712T154307, end_date=20220712T154308
+[2022-07-12 15:43:08,172] {local_task_job.py:156} INFO - Task exited with return code 0
+[2022-07-12 15:43:08,232] {local_task_job.py:273} INFO - 0 downstream tasks scheduled from follow-on schedule check

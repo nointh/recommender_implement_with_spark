@@ -1,0 +1,22 @@
+[2022-07-11 13:57:55,774] {taskinstance.py:1032} INFO - Dependencies all met for <TaskInstance: data_ingestion_gcs_dag.local_to_gcs_task manual__2022-07-11T13:57:43.176498+00:00 [queued]>
+[2022-07-11 13:57:55,792] {taskinstance.py:1032} INFO - Dependencies all met for <TaskInstance: data_ingestion_gcs_dag.local_to_gcs_task manual__2022-07-11T13:57:43.176498+00:00 [queued]>
+[2022-07-11 13:57:55,792] {taskinstance.py:1238} INFO - 
+--------------------------------------------------------------------------------
+[2022-07-11 13:57:55,792] {taskinstance.py:1239} INFO - Starting attempt 1 of 2
+[2022-07-11 13:57:55,792] {taskinstance.py:1240} INFO - 
+--------------------------------------------------------------------------------
+[2022-07-11 13:57:55,823] {taskinstance.py:1259} INFO - Executing <Task(PythonOperator): local_to_gcs_task> on 2022-07-11 13:57:43.176498+00:00
+[2022-07-11 13:57:55,830] {standard_task_runner.py:52} INFO - Started process 5728 to run task
+[2022-07-11 13:57:55,835] {standard_task_runner.py:76} INFO - Running: ['***', 'tasks', 'run', 'data_ingestion_gcs_dag', 'local_to_gcs_task', 'manual__2022-07-11T13:57:43.176498+00:00', '--job-id', '9', '--raw', '--subdir', 'DAGS_FOLDER/data_ingestion_to_gcs_dag.py', '--cfg-path', '/tmp/tmp4c6x82g_', '--error-file', '/tmp/tmplv2lomeh']
+[2022-07-11 13:57:55,837] {standard_task_runner.py:77} INFO - Job 9: Subtask local_to_gcs_task
+[2022-07-11 13:57:55,941] {logging_mixin.py:109} INFO - Running <TaskInstance: data_ingestion_gcs_dag.local_to_gcs_task manual__2022-07-11T13:57:43.176498+00:00 [running]> on host 4f99e11ef430
+[2022-07-11 13:57:56,049] {taskinstance.py:1426} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_OWNER=***
+AIRFLOW_CTX_DAG_ID=data_ingestion_gcs_dag
+AIRFLOW_CTX_TASK_ID=local_to_gcs_task
+AIRFLOW_CTX_EXECUTION_DATE=2022-07-11T13:57:43.176498+00:00
+AIRFLOW_CTX_DAG_RUN_ID=manual__2022-07-11T13:57:43.176498+00:00
+[2022-07-11 13:58:01,083] {python.py:175} INFO - Done. Returned value was: None
+[2022-07-11 13:58:01,100] {taskinstance.py:1277} INFO - Marking task as SUCCESS. dag_id=data_ingestion_gcs_dag, task_id=local_to_gcs_task, execution_date=20220711T135743, start_date=20220711T135755, end_date=20220711T135801
+[2022-07-11 13:58:01,132] {local_task_job.py:154} INFO - Task exited with return code 0
+[2022-07-11 13:58:01,173] {local_task_job.py:264} INFO - 1 downstream tasks scheduled from follow-on schedule check

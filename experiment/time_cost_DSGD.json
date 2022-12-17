@@ -1,0 +1,9 @@
+ 'DSGD stepsize=0.005, miter=10, nfactor=10, lambda=0.1': 0.8731342,
+ 'DSGD stepsize=0.005, miter=10, nfactor=20, lambda=0.1': 0.9153126,
+ 'DSGD stepsize=0.005, miter=10, nfactor=30, lambda=0.1': 0.9927008,
+ 'DSGD stepsize=0.005, miter=10, nfactor=10, lambda=0.5': 0.8618018,
+ 'DSGD stepsize=0.005, miter=10, nfactor=20, lambda=0.5': 0.91355747,
+ 'DSGD stepsize=0.005, miter=10, nfactor=30, lambda=0.5': 1.0119162,
+ 'DSGD stepsize=0.005, miter=10, nfactor=10, lambda=10': 0.86040395,
+ 'DSGD stepsize=0.005, miter=10, nfactor=20, lambda=10': 0.9073877,
+ 'DSGD stepsize=0.005, miter=10, nfactor=30, lambda=10': 0.9589843}

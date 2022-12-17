@@ -1,0 +1,33 @@
+[2022-07-12 17:50:26,279] {taskinstance.py:1179} INFO - Dependencies all met for <TaskInstance: data_ingestion_local.convert_to_csv manual__2022-07-12T17:45:13.518750+00:00 [queued]>
+[2022-07-12 17:50:26,292] {taskinstance.py:1179} INFO - Dependencies all met for <TaskInstance: data_ingestion_local.convert_to_csv manual__2022-07-12T17:45:13.518750+00:00 [queued]>
+[2022-07-12 17:50:26,292] {taskinstance.py:1376} INFO - 
+--------------------------------------------------------------------------------
+[2022-07-12 17:50:26,293] {taskinstance.py:1377} INFO - Starting attempt 2 of 2
+[2022-07-12 17:50:26,293] {taskinstance.py:1378} INFO - 
+--------------------------------------------------------------------------------
+[2022-07-12 17:50:26,309] {taskinstance.py:1397} INFO - Executing <Task(PythonOperator): convert_to_csv> on 2022-07-12 17:45:13.518750+00:00
+[2022-07-12 17:50:26,316] {standard_task_runner.py:52} INFO - Started process 514 to run task
+[2022-07-12 17:50:26,322] {standard_task_runner.py:79} INFO - Running: ['airflow', 'tasks', 'run', 'data_ingestion_local', 'convert_to_csv', 'manual__2022-07-12T17:45:13.518750+00:00', '--job-id', '4', '--raw', '--subdir', 'DAGS_FOLDER/data_ingestion_local_dag.py', '--cfg-path', '/tmp/tmpcp6b6fr1', '--error-file', '/tmp/tmp4bp_2z2f']
+[2022-07-12 17:50:26,324] {standard_task_runner.py:80} INFO - Job 4: Subtask convert_to_csv
+[2022-07-12 17:50:26,429] {task_command.py:371} INFO - Running <TaskInstance: data_ingestion_local.convert_to_csv manual__2022-07-12T17:45:13.518750+00:00 [running]> on host 9104b9631019
+[2022-07-12 17:50:26,491] {logging_mixin.py:115} WARNING - /home/airflow/.local/lib/python3.7/site-packages/airflow/utils/context.py:202 AirflowContextDeprecationWarning: Accessing 'execution_date' from the template is deprecated and will be removed in a future version. Please use 'data_interval_start' or 'logical_date' instead.
+[2022-07-12 17:50:26,544] {taskinstance.py:1591} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_OWNER=airflow
+AIRFLOW_CTX_DAG_ID=data_ingestion_local
+AIRFLOW_CTX_TASK_ID=convert_to_csv
+AIRFLOW_CTX_EXECUTION_DATE=2022-07-12T17:45:13.518750+00:00
+AIRFLOW_CTX_TRY_NUMBER=2
+AIRFLOW_CTX_DAG_RUN_ID=manual__2022-07-12T17:45:13.518750+00:00
+[2022-07-12 17:50:26,545] {taskinstance.py:1909} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/operators/python.py", line 171, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/operators/python.py", line 189, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/data_ingestion_local_dag.py", line 25, in convert_to_csv_callable
+    df = spark.read.format("parquet").load(file_name)
+AttributeError: module 'spark' has no attribute 'read'
+[2022-07-12 17:50:26,556] {taskinstance.py:1420} INFO - Marking task as FAILED. dag_id=data_ingestion_local, task_id=convert_to_csv, execution_date=20220712T174513, start_date=20220712T175026, end_date=20220712T175026
+[2022-07-12 17:50:26,569] {standard_task_runner.py:97} ERROR - Failed to execute job 4 for task convert_to_csv (module 'spark' has no attribute 'read'; 514)
+[2022-07-12 17:50:26,611] {local_task_job.py:156} INFO - Task exited with return code 1
+[2022-07-12 17:50:26,664] {local_task_job.py:273} INFO - 0 downstream tasks scheduled from follow-on schedule check
