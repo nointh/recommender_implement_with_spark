@@ -45,6 +45,16 @@ def get_movie_data(id):
     imdb = session.get(f'https://movielens.org/api/movies/{id}')
     movie_data = imdb.json()['data']['movieDetails']['movie']
     return movie_data
+def get_themoviedb_data(id):
+    API_KEY = 'cfa9db117214a23524eabcd3a1517fc8'
+    r = requests.get(f'https://api.themoviedb.org/3/movie/{id}?api_key={API_KEY}')
+    movie_data = r.json()
+    movie_data['plotSummary'] = movie_data.get('overview', '')
+    movie_data['releaseDate'] = movie_data.get('release_date', '')
+    movie_data['posterPath'] = movie_data.get('poster_path', '')
+    movie_data['languages'] = movie_data.get('spoken_languages', '')
+    movie_data['genres'] = map(lambda x: x.get('name', ''), movie_data.get('genres', []))
+    movie_data['releaseYear'] = movie_data.get('release_date', '')[:4]
 
 def load_and_scrap_movie_data():
     movies_df = pd.read_csv(f'{OUTPUT_FOlDER}/movies.csv', sep=',')
@@ -60,21 +70,24 @@ def load_and_scrap_movie_data():
     for i in fully_movie.index:
         movie_id = fully_movie.loc[i, 'movieId']
         print(f'========Processing {movie_id}==========')
-        movie_data = get_movie_data(movie_id)
+        try:
+            movie_data = get_movie_data(movie_id)
+        except Exception as e:
+            movie_data = get_themoviedb_data(fully_movie.loc[i, 'tmdbId'])
         print(movie_data)
-        fully_movie.loc[i, 'plotSummary'] = movie_data['plotSummary']
-        fully_movie.loc[i, 'releaseYear'] = movie_data['releaseYear']
-        fully_movie.loc[i, 'posterPath'] = movie_data['posterPath']
-        fully_movie.loc[i, 'releaseDate'] = movie_data['releaseDate']
-        fully_movie.loc[i, 'title'] = movie_data['title']
-        fully_movie.loc[i, 'mpaa'] = movie_data['mpaa']
-        for genre in movie_data['genres']:
+        fully_movie.loc[i, 'plotSummary'] = movie_data.get('plotSummary', '')
+        fully_movie.loc[i, 'releaseYear'] = movie_data.get('releaseYear', '')
+        fully_movie.loc[i, 'posterPath'] = movie_data.get('posterPath', '')
+        fully_movie.loc[i, 'releaseDate'] = movie_data.get('releaseDate', '')
+        fully_movie.loc[i, 'title'] = movie_data.get('title', '')
+        fully_movie.loc[i, 'mpaa'] = movie_data.get('mpaa','')
+        for genre in movie_data.get('genres', []):
             genre_df.append({'movieId': movie_id, 'genre': genre}, ignore_index=True)
-        for language in movie_data['languages']:
+        for language in movie_data.get('languages', []):
             language_df.append({'movieId': movie_id, 'language': language}, ignore_index=True)
-        for director in movie_data['directors']:
+        for director in movie_data.get('directors', []):
             director_df.append({'movieId': movie_id, 'director': director}, ignore_index=True)
-        for actor in movie_data['actors'][:5]:
+        for actor in movie_data.get('actors', []):
             actor_df.append({'movieId': movie_id, 'actor': actor}, ignore_index=True)
     fully_movie.to_sql('movies', engine, if_exists='replace', index=False)
     genre_df.to_sql('genres', engine, if_exists='replace', index=False)
