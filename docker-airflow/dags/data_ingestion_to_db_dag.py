@@ -22,11 +22,15 @@ AIRFLOW_HOME = os.environ.get("AIRFLOW_HOME", "/opt/airflow/")
 URL_PREFIX = "https://files.grouplens.org/datasets/movielens/"
 DATASET_NAME = 'ml-latest-small'
 URL = URL_PREFIX + DATASET_NAME + '.zip'
-OUTPUT_ZIP_FILE_DIR = AIRFLOW_HOME + DATASET_NAME + '.zip'
-OUTPUT_FILE_TEMPLATE = AIRFLOW_HOME + DATASET_NAME
+OUTPUT_ZIP_FILE_DIR = AIRFLOW_HOME + '/' + DATASET_NAME + '.zip'
+OUTPUT_FOlDER= AIRFLOW_HOME + '/' + DATASET_NAME
 TABLE_NAME_TEMPLATE = "yellow_taxi_{{(execution_date.replace(day = 28) - macros.timedelta(days=90)).strftime(\'%Y_%m\')}}"
 
 engine = create_engine('postgresql+psycopg2://postgres:noi123456@noing-db.c2qkku433l07.ap-southeast-1.rds.amazonaws.com:5432/postgres')
+payload = {'userName': 'noing', 'password': 'noi06122001'}
+session = requests.Session()
+session.post('https://movielens.org/api/sessions', json=payload)
+
 
 def convert_to_csv_callable(file_name):
     spark = SparkSession \
@@ -38,16 +42,13 @@ def convert_to_csv_callable(file_name):
     df.write.format('csv').mode('overwrite').option("header","true").save(new_csv_file_name)
 
 def get_movie_data(id):
-    payload = {'userName': 'noing', 'password': 'noi06122001'}
-    session = requests.Session()
-    session.post('https://movielens.org/api/sessions', json=payload)
     imdb = session.get(f'https://movielens.org/api/movies/{id}')
     movie_data = imdb.json()['data']['movieDetails']['movie']
     return movie_data
 
-def load_movie_data():
-    movies_df = pd.read_csv(f'{OUTPUT_FILE_TEMPLATE}/movies.csv', sep=',')
-    links_df = pd.read_csv(f'{OUTPUT_FILE_TEMPLATE}/links.csv', sep=',')
+def load_and_scrap_movie_data():
+    movies_df = pd.read_csv(f'{OUTPUT_FOlDER}/movies.csv', sep=',')
+    links_df = pd.read_csv(f'{OUTPUT_FOlDER}/links.csv', sep=',')
     fully_movie = movies_df.merge(links_df, on='movieId', suffixes=('_1', '_2'))
     fully_movie.drop('genres', axis=1, inplace=True)
 
@@ -73,19 +74,47 @@ def load_movie_data():
             director_df.append({'movieId': movie_id, 'director': director}, ignore_index=True)
         for actor in movie_data['actors'][:5]:
             actor_df.append({'movieId': movie_id, 'actor': actor}, ignore_index=True)
-    fully_movie.to_sql('movie', engine, if_exists='replace', index=False)
-    genre_df.to_sql('genre', engine, if_exists='replace', index=False)
-    language_df.to_sql('language', engine, if_exists='replace', index=False)
-    director_df.to_sql('director', engine, if_exists='replace', index=False)
-    actor_df.to_sql('actor', engine, if_exists='replace', index=False)
+    fully_movie.to_sql('movies', engine, if_exists='replace', index=False)
+    genre_df.to_sql('genres', engine, if_exists='replace', index=False)
+    language_df.to_sql('languages', engine, if_exists='replace', index=False)
+    director_df.to_sql('directors', engine, if_exists='replace', index=False)
+    actor_df.to_sql('actors', engine, if_exists='replace', index=False)
+
+def generate_users_data():
+    ratings_df = pd.read_csv(f'{OUTPUT_FOlDER}/ratings.csv', sep=',')
+    tags_df = pd.read_csv(f'{OUTPUT_FOlDER}/tags.csv', sep=',')
+    full_df = ratings_df.join(tags_df, rsuffix='_1', on='userId', how='outer')
+    users_df = full_df[['userId']]
+    users_df.drop_duplicates(inplace=True, keep='last')
+    users_df.reset_index(drop=True, level=0, inplace=True)
+    for i in users_df.index:
+        id = users_df.loc[i, 'userId']
+        users_df.loc[i, 'username'] = f'user_{id}'
+        users_df.loc[i, 'password'] = f'123456'
+    users_df.to_sql('users', engine, if_exists='replace', index=False)
+
+def load_movie_data():
+    movies_df = pd.read_csv(f'{OUTPUT_FOlDER}/movies.csv', sep=',')
+    links_df = pd.read_csv(f'{OUTPUT_FOlDER}/links.csv', sep=',')
+    fully_movie = movies_df.merge(links_df, on='movieId', suffixes=('_1', '_2'))
+    genre_df = pd.DataFrame(columns=['movieId', 'genre'])
+    for i in fully_movie.index:
+        movie_id = fully_movie.loc[i, 'movieId']
+        genres = fully_movie.loc[i, 'genres'].split('|')
+        for genre in genres:
+            genre_df.append({'movieId': movie_id, 'genre': genre}, ignore_index=True)
+    fully_movie.drop('genres', axis=1, inplace=True)
+    fully_movie.to_sql('movies', engine, if_exists='replace', index=False)
 
 def load_rating_data():
-    rating_df = pd.read_csv(f'{OUTPUT_FILE_TEMPLATE}/ratings.csv', sep=',')
-    rating_df.to_sql('rating', engine, if_exists='replace', index=False)
+    ratings_df = pd.read_csv(f'{OUTPUT_FOlDER}/ratings.csv', sep=',')
+    ratings_df['timestamp'] = pd.to_datetime(ratings_df['timestamp'], unit='s')
+    ratings_df.to_sql('ratings', engine, if_exists='replace', index=False)
 
 def load_tag_data():
-    tag_df = pd.read_csv(f'{OUTPUT_FILE_TEMPLATE}/tags.csv', sep=',')
-    tag_df.to_sql('tag', engine, if_exists='replace', index=False)
+    tags_df = pd.read_csv(f'{OUTPUT_FOlDER}/tags.csv', sep=',')
+    tags_df['timestamp'] = pd.to_datetime(tags_df['timestamp'], unit='s')
+    tags_df.to_sql('tags', engine, if_exists='replace', index=False)
 
 default_args = {
     "owner": "airflow",
@@ -95,15 +124,29 @@ default_args = {
 }
 
 local_workflow = DAG(
-    dag_id='data_ingestion_local',
+    dag_id='data_ingestion_to_database',
     schedule_interval='0 6 2 * *',
     default_args=default_args
 )
 with local_workflow:
+    check_if_exist_zip_file = BashOperator(
+        task_id='check_if_exist_zip_file',
+        #bash_command=f"curl -sSL {URL} > {OUTPUT_FILE_TEMPLATE} && unzip {OUTPUT_FILE_TEMPLATE}"
+        bash_command=f'if [ -f "{OUTPUT_ZIP_FILE_DIR}" ]; then\
+                rm {OUTPUT_ZIP_FILE_DIR};\
+            fi'
+    )
+    check_if_exist_folder = BashOperator(
+        task_id='check_if_exist_folder',
+        #bash_command=f"curl -sSL {URL} > {OUTPUT_FILE_TEMPLATE} && unzip {OUTPUT_FILE_TEMPLATE}"
+        bash_command=f'if [ -d "{OUTPUT_FOlDER}" ]; then\
+                rm -r {OUTPUT_FOlDER};\
+            fi'
+    )
     download_task = BashOperator(
         task_id='download',
         #bash_command=f"curl -sSL {URL} > {OUTPUT_FILE_TEMPLATE} && unzip {OUTPUT_FILE_TEMPLATE}"
-        bash_command=f"(cd {AIRFLOW_HOME} && curl -O {URL} && unzip {DATASET_NAME}.zip"
+        bash_command=f'(cd {AIRFLOW_HOME} && curl -O {URL} && unzip {DATASET_NAME}.zip)'
     )
     # convert_to_csv = PythonOperator(
     #     task_id='convert_to_csv',
@@ -112,9 +155,9 @@ with local_workflow:
     #         'file_name': OUTPUT_FILE_TEMPLATE
     #     }
     # )
-    scrap_movies_and_ingest = PythonOperator(
-        task_id='scrap_movie_and_ingest',
-        python_callable=load_movie_data,
+    ingest_and_scrap_movie_data = PythonOperator(
+        task_id='ingest_and_scrap_movie',
+        python_callable=load_and_scrap_movie_data,
         # op_kwargs={
         #     'user': PG_USER,
         #     'password': PG_PASSWORD,
@@ -134,8 +177,14 @@ with local_workflow:
         task_id='ingest_tag_data',
         python_callable=load_tag_data,
     )
+    ingest_and_generate_users = PythonOperator(
+        task_id='ingest_and_generate_users',
+        python_callable=generate_users_data,
+    )
 
-
-    download_task >> scrap_movies_and_ingest
+    check_if_exist_zip_file >> download_task
+    check_if_exist_folder >> download_task
+    download_task >> ingest_and_scrap_movie_data
+    download_task >> ingest_and_generate_users
     download_task >> ingest_ratings
     download_task >> ingest_tags
