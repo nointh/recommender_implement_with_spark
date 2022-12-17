@@ -59,7 +59,9 @@ def load_and_scrap_movie_data():
 
     for i in fully_movie.index:
         movie_id = fully_movie.loc[i, 'movieId']
+        print(f'========Processing {movie_id}==========')
         movie_data = get_movie_data(movie_id)
+        print(movie_data)
         fully_movie.loc[i, 'plotSummary'] = movie_data['plotSummary']
         fully_movie.loc[i, 'releaseYear'] = movie_data['releaseYear']
         fully_movie.loc[i, 'posterPath'] = movie_data['posterPath']
