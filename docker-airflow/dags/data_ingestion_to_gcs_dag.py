@@ -8,16 +8,29 @@ from airflow.operators.python import PythonOperator
 
 from google.cloud import storage
 from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateExternalTableOperator
+from airflow.providers.google.cloud.operators.dataproc import DataprocSubmitJobOperator
 import pyarrow.csv as pv
 import pyarrow.parquet as pq
 from sqlalchemy import create_engine, text
 import pandas as pd
+import io
+import json
+
 PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
 BUCKET = os.environ.get("GCP_GCS_BUCKET")
-
+CLUSTER_NAME = os.environ.get("GCP_CLUSTER_NAME", 'hadoopcluster')
+PYSPARK_URI = 'gs://movie_recommenders/pyspark_jobs/test.py'
 path_to_local_home = os.environ.get("AIRFLOW_HOME", "/opt/airflow/")
 BIGQUERY_DATASET = os.environ.get("BIGQUERY_DATASET", 'trips_data_all')
 EXECUTION_TIME = "{{ execution_date | ts_nodash }}"
+
+PYSPARK_JOB = {
+    'reference': { 'project_id': PROJECT_ID},
+    'placement': {'cluster_name': CLUSTER_NAME},
+    'pyspark_job': {'main_python_file_uri': PYSPARK_URI, 
+        'args': ["--date=val1"]
+        }
+}
 
 engine = create_engine('postgresql+psycopg2://postgres:noi123456@noing-db.c2qkku433l07.ap-southeast-1.rds.amazonaws.com:5432/postgres')
 
@@ -53,6 +66,41 @@ def upload_to_gcs(bucket, object_name):
     blob = bucket.blob(object_name)
     blob.upload_from_string(df.to_csv(index=False), 'text/csv')
 
+def preprocess_data(bucket, raw_input_object, output_folder):
+    client = storage.Client()
+    print(f'Pulled down file from bucket {bucket}, file name: {raw_input_object}')
+    bucket = client.bucket(bucket)
+    input_blob = bucket.blob(raw_input_object)
+    data = input_blob.download_as_bytes()
+    df = pd.read_csv(io.BytesIO(data))
+    
+    user_df = df[['userId']]
+    user_df = user_df.drop_duplicates(keep='last')
+    user_df = user_df.sort_values(by=['userId'])
+    user_df.reset_index(drop=True, level=0, inplace=True)
+    user_dict = dict(zip(user_df['userId'].values ,list(user_df.index+1)))
+
+
+    movie_df = df[['movieId']]
+    movie_df = movie_df.drop_duplicates(keep='last')
+    movie_df = movie_df.sort_values(by=['movieId'])
+    movie_df.reset_index(drop=True, level=0, inplace=True)
+    movie_dict = dict(zip(movie_df['movieId'].values ,list(movie_df.index+1)))
+
+    df['movieId'] = df['movieId'].map(lambda x: movie_dict[x])
+    df['userId'] = df['userId'].map(lambda x: user_dict[x])
+
+    output_blob = bucket.blob(output_folder + 'ratings.csv')
+    output_blob.upload_from_string(df.to_csv(index=False), 'text/csv')
+
+    movie_dict = {int(key): int(val) for key, val in movie_dict.items()}
+    user_dict = {int(key): int(val) for key, val in user_dict.items()}
+    
+    user_dict_blob = bucket.blob(output_folder + 'user_dict.json')
+    user_dict_blob.upload_from_string(json.dumps(user_dict), 'application/json')
+
+    movie_dict_blob = bucket.blob(output_folder + 'movie_dict.json')
+    movie_dict_blob.upload_from_string(json.dumps(movie_dict), 'application/json')
 
 
 default_args = {
@@ -94,7 +142,22 @@ with DAG(
             "object_name": f"{EXECUTION_TIME}/raw/ratings.csv"
         },
     )
+    preprocess_data_task = PythonOperator(
+        task_id="preprocess_data_task",
+        python_callable=preprocess_data,
+        op_kwargs={
+            "bucket": BUCKET,
+            "raw_input_object": f"{EXECUTION_TIME}/raw/ratings.csv",
+            "output_folder": f"{EXECUTION_TIME}/processed/"
+        },
+    )
 
+    submit_job_task = DataprocSubmitJobOperator(
+        task_id='submit_job_task',
+        job=PYSPARK_JOB,
+        region='us-central1',
+        project_id=PROJECT_ID
+    )
     # bigquery_external_table_task = BigQueryCreateExternalTableOperator(
     #     task_id="bigquery_external_table_task",
     #     table_resource={
@@ -110,5 +173,5 @@ with DAG(
     #     },
     # )
 
-    local_to_gcs_task
+    local_to_gcs_task >> preprocess_data_task >> submit_job_task
     # download_dataset_task  >> local_to_gcs_task >> bigquery_external_table_task

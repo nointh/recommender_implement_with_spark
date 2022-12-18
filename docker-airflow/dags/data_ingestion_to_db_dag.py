@@ -83,13 +83,13 @@ def load_and_scrap_movie_data():
         fully_movie.loc[i, 'title'] = movie_data.get('title', '')
         fully_movie.loc[i, 'mpaa'] = movie_data.get('mpaa','')
         for genre in movie_data.get('genres', []):
-            genre_df.append({'movieId': movie_id, 'genre': genre}, ignore_index=True)
+            genre_df = genre_df.append({'movieId': movie_id, 'genre': genre}, ignore_index=True)
         for language in movie_data.get('languages', []):
-            language_df.append({'movieId': movie_id, 'language': language}, ignore_index=True)
+            language_df = language_df.append({'movieId': movie_id, 'language': language}, ignore_index=True)
         for director in movie_data.get('directors', []):
-            director_df.append({'movieId': movie_id, 'director': director}, ignore_index=True)
+            director_df = director_df.append({'movieId': movie_id, 'director': director}, ignore_index=True)
         for actor in movie_data.get('actors', []):
-            actor_df.append({'movieId': movie_id, 'actor': actor}, ignore_index=True)
+            actor_df = actor_df.append({'movieId': movie_id, 'actor': actor}, ignore_index=True)
     fully_movie.to_sql('movies', engine, if_exists='replace', index=False)
     genre_df.to_sql('genres', engine, if_exists='replace', index=False)
     language_df.to_sql('languages', engine, if_exists='replace', index=False)
