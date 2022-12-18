@@ -61,7 +61,7 @@ def load_and_scrap_movie_data():
     movies_df = pd.read_csv(f'{OUTPUT_FOlDER}/movies.csv', sep=',')
     links_df = pd.read_csv(f'{OUTPUT_FOlDER}/links.csv', sep=',')
     fully_movie = movies_df.merge(links_df, on='movieId', suffixes=('_1', '_2'))
-    fully_movie.drop('genres', axis=1, inplace=True)
+    #fully_movie.drop('genres', axis=1, inplace=True)
 
     genre_df = pd.DataFrame(columns=['movieId', 'genre'])
     language_df = pd.DataFrame(columns=['movieId', 'language'])
