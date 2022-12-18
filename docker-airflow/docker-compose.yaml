@@ -69,8 +69,8 @@ x-airflow-common:
     PG_PORT: "${PG_PORT}"
 
 
-    GCP_PROJECT_ID: 'taxi-data-de-project'
-    GCP_GCS_BUCKET: "dtc_data_lake_taxi-data-de-project"
+    GCP_PROJECT_ID: 'sonorous-reach-371710'
+    GCP_GCS_BUCKET: "movie_recommenders"
   volumes:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs

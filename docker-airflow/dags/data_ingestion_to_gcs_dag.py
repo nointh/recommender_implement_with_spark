@@ -10,16 +10,16 @@ from google.cloud import storage
 from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateExternalTableOperator
 import pyarrow.csv as pv
 import pyarrow.parquet as pq
-
+from sqlalchemy import create_engine, text
+import pandas as pd
 PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
 BUCKET = os.environ.get("GCP_GCS_BUCKET")
 
-dataset_file = "yellow_tripdata_2021-01.parquet"
-dataset_url = f"https://d37ci6vzurychx.cloudfront.net/trip-data/{dataset_file}"
 path_to_local_home = os.environ.get("AIRFLOW_HOME", "/opt/airflow/")
-parquet_file = dataset_file.replace('.csv', '.parquet')
 BIGQUERY_DATASET = os.environ.get("BIGQUERY_DATASET", 'trips_data_all')
+EXECUTION_TIME = "{{ execution_date | ts_nodash }}"
 
+engine = create_engine('postgresql+psycopg2://postgres:noi123456@noing-db.c2qkku433l07.ap-southeast-1.rds.amazonaws.com:5432/postgres')
 
 # def format_to_parquet(src_file):
 #     if not src_file.endswith('.csv'):
@@ -30,7 +30,7 @@ BIGQUERY_DATASET = os.environ.get("BIGQUERY_DATASET", 'trips_data_all')
 
 
 # NOTE: takes 20 mins, at an upload speed of 800kbps. Faster if your internet has a better upload speed
-def upload_to_gcs(bucket, object_name, local_file):
+def upload_to_gcs(bucket, object_name):
     """
     Ref: https://cloud.google.com/storage/docs/uploading-objects#storage-upload-object-python
     :param bucket: GCS bucket name
@@ -40,15 +40,19 @@ def upload_to_gcs(bucket, object_name, local_file):
     """
     # WORKAROUND to prevent timeout for files > 6 MB on 800 kbps upload speed.
     # (Ref: https://github.com/googleapis/python-storage/issues/74)
-    storage.blob._MAX_MULTIPART_SIZE = 5 * 1024 * 1024  # 5 MB
-    storage.blob._DEFAULT_CHUNKSIZE = 5 * 1024 * 1024  # 5 MB
+    # storage.blob._MAX_MULTIPART_SIZE = 5 * 1024 * 1024  # 5 MB
+    # storage.blob._DEFAULT_CHUNKSIZE = 5 * 1024 * 1024  # 5 MB
     # End of Workaround
-
+    with engine.connect() as conn:
+        result = conn.execute(text('select "userId", "movieId", "rating" from ratings'))
+        ratings = result.all()
+    df = pd.DataFrame(ratings, columns = ['userId', 'movieId', 'rating'])
     client = storage.Client()
     bucket = client.bucket(bucket)
 
     blob = bucket.blob(object_name)
-    blob.upload_from_filename(local_file)
+    blob.upload_from_string(df.to_csv(index=False), 'text/csv')
+
 
 
 default_args = {
@@ -68,10 +72,10 @@ with DAG(
     tags=['dtc_data_lake_taxi-data-de-project'],
 ) as dag:
 
-    download_dataset_task = BashOperator(
-        task_id="download_dataset_task",
-        bash_command=f"curl -sSL {dataset_url} > {path_to_local_home}/{dataset_file}"
-    )
+    # download_dataset_task = BashOperator(
+    #     task_id="download_dataset_task",
+    #     bash_command=f"curl -sSL {dataset_url} > {path_to_local_home}/{dataset_file}"
+    # )
 
     # format_to_parquet_task = PythonOperator(
     #     task_id="format_to_parquet_task",
@@ -87,24 +91,24 @@ with DAG(
         python_callable=upload_to_gcs,
         op_kwargs={
             "bucket": BUCKET,
-            "object_name": f"raw/{dataset_file}",
-            "local_file": f"{path_to_local_home}/{dataset_file}",
+            "object_name": f"{EXECUTION_TIME}/raw/ratings.csv"
         },
     )
 
-    bigquery_external_table_task = BigQueryCreateExternalTableOperator(
-        task_id="bigquery_external_table_task",
-        table_resource={
-            "tableReference": {
-                "projectId": PROJECT_ID,
-                "datasetId": BIGQUERY_DATASET,
-                "tableId": "external_table",
-            },
-            "externalDataConfiguration": {
-                "sourceFormat": "PARQUET",
-                "sourceUris": [f"gs://{BUCKET}/raw/{dataset_file}"],
-            },
-        },
-    )
+    # bigquery_external_table_task = BigQueryCreateExternalTableOperator(
+    #     task_id="bigquery_external_table_task",
+    #     table_resource={
+    #         "tableReference": {
+    #             "projectId": PROJECT_ID,
+    #             "datasetId": BIGQUERY_DATASET,
+    #             "tableId": "external_table",
+    #         },
+    #         "externalDataConfiguration": {
+    #             "sourceFormat": "PARQUET",
+    #             "sourceUris": [f"gs://{BUCKET}/raw/{dataset_file}"],
+    #         },
+    #     },
+    # )
 
-    download_dataset_task  >> local_to_gcs_task >> bigquery_external_table_task
+    local_to_gcs_task
+    # download_dataset_task  >> local_to_gcs_task >> bigquery_external_table_task
