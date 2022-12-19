@@ -19,7 +19,7 @@ import json
 PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
 BUCKET = os.environ.get("GCP_GCS_BUCKET")
 CLUSTER_NAME = os.environ.get("GCP_CLUSTER_NAME", 'hadoopcluster')
-PYSPARK_URI = 'gs://movie_recommenders/pyspark_jobs/test.py'
+PYSPARK_URI = 'gs://movie_recommenders/pyspark_jobs/mf.py'
 path_to_local_home = os.environ.get("AIRFLOW_HOME", "/opt/airflow/")
 BIGQUERY_DATASET = os.environ.get("BIGQUERY_DATASET", 'trips_data_all')
 EXECUTION_TIME = "{{ execution_date | ts_nodash }}"
@@ -28,7 +28,7 @@ PYSPARK_JOB = {
     'reference': { 'project_id': PROJECT_ID},
     'placement': {'cluster_name': CLUSTER_NAME},
     'pyspark_job': {'main_python_file_uri': PYSPARK_URI, 
-        'args': ["--date=val1"]
+        'args': [f"--input=gs://{BUCKET}/{EXECUTION_TIME}/processed/ratings.csv"]
         }
 }
 
@@ -112,7 +112,7 @@ default_args = {
 
 # NOTE: DAG declaration - using a Context Manager (an implicit way)
 with DAG(
-    dag_id="data_ingestion_gcs_dag",
+    dag_id="process_model_dag",
     schedule_interval="@daily",
     default_args=default_args,
     catchup=False,
@@ -134,8 +134,8 @@ with DAG(
     # )
 
     # TODO: Homework - research and try XCOM to communicate output values between 2 tasks/operators
-    local_to_gcs_task = PythonOperator(
-        task_id="local_to_gcs_task",
+    retrieve_data_task = PythonOperator(
+        task_id="retrieve_data_task",
         python_callable=upload_to_gcs,
         op_kwargs={
             "bucket": BUCKET,
@@ -173,5 +173,5 @@ with DAG(
     #     },
     # )
 
-    local_to_gcs_task >> preprocess_data_task >> submit_job_task
+    retrieve_data_task >> preprocess_data_task >> submit_job_task
     # download_dataset_task  >> local_to_gcs_task >> bigquery_external_table_task
