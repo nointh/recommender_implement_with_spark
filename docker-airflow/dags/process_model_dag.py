@@ -22,7 +22,7 @@ CLUSTER_NAME = os.environ.get("GCP_CLUSTER_NAME", 'hadoopcluster')
 PYSPARK_URI = 'gs://movie_recommenders/pyspark_jobs/mf.py'
 path_to_local_home = os.environ.get("AIRFLOW_HOME", "/opt/airflow/")
 BIGQUERY_DATASET = os.environ.get("BIGQUERY_DATASET", 'trips_data_all')
-EXECUTION_TIME = "{{ execution_date | ts_nodash }}"
+EXECUTION_TIME = "{{ data_interval_start | ts_nodash }}"
 
 PYSPARK_JOB = {
     'reference': { 'project_id': PROJECT_ID},

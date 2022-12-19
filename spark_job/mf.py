@@ -70,8 +70,8 @@ class DSGD:
         self.train_rmse_arr = []
         self.test_rmse_arr = []
         numFactors = self.num_factor
-        #numWorkers = sc.defaultParallelism
-        numWorkers = 2
+        numWorkers = sc.defaultParallelism
+        #numWorkers = 2
         stepSize = self.step_size
         max_iter = self.max_iter
         numRows = originRDD.map(lambda x: x[0]).distinct().count()
@@ -79,7 +79,9 @@ class DSGD:
         W = originRDD.map(lambda x: tuple([int(x[0]),1])).reduceByKey(lambda x,y : x+y).map(lambda x: tuple([x[0], tuple([x[1], np.random.rand(1,numFactors).astype('float16')])])).persist()
         H = originRDD.map(lambda x: tuple([int(x[1]),1])).reduceByKey(lambda x,y : x+y).map(lambda x: tuple([x[0], tuple([x[1], np.random.rand(1,numFactors).astype('float16')])])).persist()
         Vblocked = trainRDD.keyBy(lambda x: self.assignBlockIndex(x[0], numRows, numWorkers)).partitionBy(numWorkers)
-        # print(Vblocked.map(lambda x: x[0]).distinct().collect())
+        
+        print(perms)
+        print(Vblocked.map(lambda x: x[0]).distinct().collect())
         # print(Vblocked.max(lambda x: x[1][1]))
         # print(Vblocked.min(lambda x: x[1][1]))
         #init first time rmse

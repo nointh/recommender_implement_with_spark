@@ -71,7 +71,7 @@ x-airflow-common:
 
     GCP_PROJECT_ID: 'sonorous-reach-371710'
     GCP_GCS_BUCKET: "movie_recommenders"
-    GCP_CLUSTER_NAME: "movie_recommenders"
+    GCP_CLUSTER_NAME: "hadoopcluster"
   volumes:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
