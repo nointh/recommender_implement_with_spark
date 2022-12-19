@@ -5,6 +5,7 @@ import datetime
 from pyspark.sql import SparkSession
 import argparse
 import math
+import json
 
 class DSGD:
     def __init__(self, num_factor, step_size, max_iter, lambd) -> None:
@@ -39,9 +40,13 @@ class DSGD:
 
             (Nw, Wprev) = Wdict[i]
             (Nh, Hprev) = Hdict[j]
-            error = (rat - np.dot(Wprev, Hprev.T))
-            #print(f'error: {error}')
-            mse += pow((error[0, 0]), 2)
+
+            # print(f'W vec {type(Wprev)}: {Wprev.shape} ')
+            # print(f'H vec {type(Hprev)}: {Hprev.shape} ')
+            error = (rat - np.dot(Wprev, Hprev.T)[0, 0])
+            # print(f'error: {error}')
+            # print(f'error: {error[0]}')
+            mse += pow((error), 2)
             
             Wnew = Wprev - stepSize.value*(-2*error*Hprev+ (2.0*lam.value)*Wprev)
             Hnew = Hprev - stepSize.value*(-2*error*Wprev + (2.0*lam.value)*Hprev)
@@ -80,8 +85,7 @@ class DSGD:
         H = originRDD.map(lambda x: tuple([int(x[1]),1])).reduceByKey(lambda x,y : x+y).map(lambda x: tuple([x[0], tuple([x[1], np.random.rand(1,numFactors).astype('float16')])])).persist()
         Vblocked = trainRDD.keyBy(lambda x: self.assignBlockIndex(x[0], numRows, numWorkers)).partitionBy(numWorkers)
         
-        print(perms)
-        print(Vblocked.map(lambda x: x[0]).distinct().collect())
+        # print(Vblocked.map(lambda x: x[0]).distinct().collect())
         # print(Vblocked.max(lambda x: x[1][1]))
         # print(Vblocked.min(lambda x: x[1][1]))
         #init first time rmse
@@ -108,10 +112,13 @@ class DSGD:
             perms_dict = {i: val for i, val in enumerate(perms)}
             rev_perms=list(i for i in (dict(sorted(perms_dict.items(), key=lambda item: item[1]))).keys())
             
-            Vfilt = Vblocked.filter(lambda x: perms[x[0]-1]==self.assignBlockIndex(x[1][1],numCols,numWorkers)).persist()
-            Hblocked = H.keyBy(lambda x: rev_perms[self.assignBlockIndex(x[0], numCols, numWorkers)-1])
+            Vfilt = Vblocked.filter(lambda x: perms[x[0]]==self.assignBlockIndex(x[1][1],numCols,numWorkers)).persist()
+            Hblocked = H.keyBy(lambda x: rev_perms[self.assignBlockIndex(x[0], numCols, numWorkers)])
             Wblocked = W.keyBy(lambda x: self.assignBlockIndex(x[0], numRows, numWorkers))
-            
+
+            # print(perms)
+            # print(Vfilt.map(lambda x: x[0]).distinct().collect())
+
             groupRDD = Vfilt.groupWith(Hblocked, Wblocked).partitionBy(numWorkers)
             
             WH = groupRDD.mapPartitions(lambda x: self.SGD(x, stepSize, numFactors,lam, mse, nUpdates))
@@ -133,6 +140,16 @@ class DSGD:
             # print("RMSE: {}".format(rmse))
             # print("Global RMSE: {}".format(train_rmse))
         self.time_cost = datetime.datetime.now() - t0
+        
+        self.w_matrix = { key: [float(f) for f in val[0]] for key, val in w_broadcast.value.items() }
+        self.h_matrix = { key: [float(f) for f in val[0]] for key, val in h_broadcast.value.items() }
+
+    def get_movie_factor_matrix(self):
+        return self.h_matrix
+
+    def get_user_factor_matrix(self):
+        return self.w_matrix
+
     def get_train_rmse(self):
         return self.train_rmse_arr[-1]
 
@@ -240,6 +257,19 @@ class ALS:
             # print("\nRMSE: %5.4f\n" % train_rmse)
             # print("\nRMSE: %5.4f\n" % test_rmse)
         self.time_cost = datetime.datetime.now() - t0
+        self.w_matrix = w_broadcast.value
+        user_dict = {val: key for key, val in sorted_users.items()}
+        self.w_matrix = { user_dict[i]: [float(f) for f in val] for i, val in enumerate(W)}
+
+        movie_dict = {val: key for key, val in sorted_items.items()}
+        self.h_matrix = { movie_dict[i]: [float(f) for f in val] for i, val in enumerate(H)}
+
+    def get_movie_factor_matrix(self):
+        return self.h_matrix
+
+    def get_user_factor_matrix(self):
+        return self.w_matrix
+
     def get_train_rmse(self):
         return self.train_rmse_arr[-1]
 
@@ -247,7 +277,11 @@ class ALS:
         return self.test_rmse_arr[-1]
     def get_time_cost(self):
         return self.time_cost
-
+    def get_result_as_dict(self):
+        return {
+            'time_cost': self.time_cost,
+            'rmse': self.test
+        }
     # def plot_rmse(self, title="ALS model"):
     #     plt.plot(self.train_rmse_arr, label="train loss")
     #     plt.plot(self.test_rmse_arr, label="test loss")
@@ -281,13 +315,29 @@ def main(params):
 
     trainRDD, testRDD = originRDD.randomSplit([0.8,0.2], 42)
 
-    DSGDmodel = DSGD(step_size=0.001, num_factor=10, max_iter=10, lambd=0.5)
+    DSGDmodel = DSGD(step_size=0.0005, num_factor=10, max_iter=1, lambd=1)
     DSGDmodel.train(sc, originRDD, trainRDD, testRDD)
     print(DSGDmodel.get_test_rmse())
+    #print(type(DSGDmodel.get_user_factor_matrix()))
+    #print(json.dumps(DSGDmodel.get_user_factor_matrix()))
+    print(len(DSGDmodel.get_user_factor_matrix().keys()))
+    print(len(DSGDmodel.get_movie_factor_matrix().keys()))
+
+    ALSmodel = ALS(num_factor=10, max_iter=1, lambd=20)
+    ALSmodel.train(sc, originRDD, trainRDD, testRDD)
+    print(ALSmodel.get_test_rmse())
+    print(len(ALSmodel.get_user_factor_matrix().keys()))
+    print(len(ALSmodel.get_movie_factor_matrix().keys()))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='argument for spark jobs')
 
     parser.add_argument('--input', default='gs://movie_recommenders/20221218T143829/processed/ratings.csv')
+    parser.add_argument('--output', default='gs://movie_recommenders/20221218T143829/model_result/ratings.csv')
+    parser.add_argument('--model', default='sgd')
+    parser.add_argument('--stepsize', type=float, default=0.01)
+    parser.add_argument('--maxiter', type=int, default=0)
+    parser.add_argument('--lambda', type=float, default=1)
+
     args = parser.parse_args()
     main(args)
