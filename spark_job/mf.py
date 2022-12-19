@@ -4,6 +4,7 @@ from numpy.linalg import inv
 import datetime
 from pyspark.sql import SparkSession
 import argparse
+import math
 
 class DSGD:
     def __init__(self, num_factor, step_size, max_iter, lambd) -> None:
@@ -39,7 +40,8 @@ class DSGD:
             (Nw, Wprev) = Wdict[i]
             (Nh, Hprev) = Hdict[j]
             error = (rat - np.dot(Wprev, Hprev.T))
-            mse += pow((error[0][0]), 2)
+            #print(f'error: {error}')
+            mse += pow((error[0, 0]), 2)
             
             Wnew = Wprev - stepSize.value*(-2*error*Hprev+ (2.0*lam.value)*Wprev)
             Hnew = Hprev - stepSize.value*(-2*error*Wprev + (2.0*lam.value)*Hprev)
@@ -50,22 +52,26 @@ class DSGD:
         return (tuple(['W',Wdict.items()]), tuple(['H',Hdict.items()]))
 
     def get_rmse(self, R, w, h):
+        #print(R.map(lambda x: x[0]).distinct().collect())
+        #print(R.map(lambda x: x[1]).distinct().collect())
         sse = R.map(lambda x: (x[2] - w.value[x[0]].dot(h.value[x[1]].T))**2 ).reduce(lambda x,y: x+y)
         count = R.count()
         rmse = pow(sse/count, 0.5)
         return rmse
 
     def assignBlockIndex (self, index, numData, numWorkers):
-        blockSize = numData/numWorkers
-        if(numData % numWorkers != 0): blockSize = blockSize + 1
-        return int(np.floor(index/np.ceil(blockSize)))+1
+        blockSize = math.ceil(numData*1.0/numWorkers)
+        # if(numData % numWorkers != 0): blockSize = blockSize + 1
+        # return int(np.floor(index/np.ceil(blockSize)))+1
+        return int(math.floor((index-1)/blockSize))
 
     def train(self, sc, originRDD, trainRDD, testRDD):
         t0 = datetime.datetime.now()
         self.train_rmse_arr = []
         self.test_rmse_arr = []
         numFactors = self.num_factor
-        numWorkers = sc.defaultParallelism
+        #numWorkers = sc.defaultParallelism
+        numWorkers = 2
         stepSize = self.step_size
         max_iter = self.max_iter
         numRows = originRDD.map(lambda x: x[0]).distinct().count()
@@ -73,15 +79,15 @@ class DSGD:
         W = originRDD.map(lambda x: tuple([int(x[0]),1])).reduceByKey(lambda x,y : x+y).map(lambda x: tuple([x[0], tuple([x[1], np.random.rand(1,numFactors).astype('float16')])])).persist()
         H = originRDD.map(lambda x: tuple([int(x[1]),1])).reduceByKey(lambda x,y : x+y).map(lambda x: tuple([x[0], tuple([x[1], np.random.rand(1,numFactors).astype('float16')])])).persist()
         Vblocked = trainRDD.keyBy(lambda x: self.assignBlockIndex(x[0], numRows, numWorkers)).partitionBy(numWorkers)
-        print(Vblocked.map(lambda x: x[0]).distinct().collect())
-        print(Vblocked.max(lambda x: x[1][1]))
-        print(Vblocked.min(lambda x: x[1][1]))
+        # print(Vblocked.map(lambda x: x[0]).distinct().collect())
+        # print(Vblocked.max(lambda x: x[1][1]))
+        # print(Vblocked.min(lambda x: x[1][1]))
         #init first time rmse
         Wvec = W.map(lambda x: (x[0], x[1][1])).collect()
         w_broadcast = sc.broadcast(dict(Wvec))
         Hvec = H.map(lambda x: (x[0], x[1][1])).collect()
         h_broadcast = sc.broadcast(dict(Hvec))
-
+        #print(h_broadcast.value)
         train_rmse = self.get_rmse(trainRDD, w_broadcast, h_broadcast)[0,0]
         test_rmse = self.get_rmse(testRDD, w_broadcast, h_broadcast)[0,0]
         self.train_rmse_arr.append(train_rmse)
@@ -96,15 +102,11 @@ class DSGD:
             stepSize = sc.broadcast(stepSize.value * 0.9)
             #generate random strata
 
-            perms = np.random.permutation(numWorkers)+1
+            perms = np.random.permutation(numWorkers)
             perms_dict = {i: val for i, val in enumerate(perms)}
-            rev_perms=list(i+1 for i in (dict(sorted(perms_dict.items(), key=lambda item: item[1]))).keys())
+            rev_perms=list(i for i in (dict(sorted(perms_dict.items(), key=lambda item: item[1]))).keys())
             
             Vfilt = Vblocked.filter(lambda x: perms[x[0]-1]==self.assignBlockIndex(x[1][1],numCols,numWorkers)).persist()
-            print(numCols)
-            print(numRows)
-            print(rev_perms)
-            print(H.map(lambda x: self.assignBlockIndex(x[0], numCols, numWorkers)).distinct().collect())
             Hblocked = H.keyBy(lambda x: rev_perms[self.assignBlockIndex(x[0], numCols, numWorkers)-1])
             Wblocked = W.keyBy(lambda x: self.assignBlockIndex(x[0], numRows, numWorkers))
             
