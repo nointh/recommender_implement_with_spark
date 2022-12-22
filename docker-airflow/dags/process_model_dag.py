@@ -21,7 +21,7 @@ BUCKET = os.environ.get("GCP_GCS_BUCKET")
 CLUSTER_NAME = os.environ.get("GCP_CLUSTER_NAME", 'hadoopcluster')
 PYSPARK_URI = 'gs://movie_recommenders/pyspark_jobs/mf.py'
 path_to_local_home = os.environ.get("AIRFLOW_HOME", "/opt/airflow/")
-BIGQUERY_DATASET = os.environ.get("BIGQUERY_DATASET", 'trips_data_all')
+BIGQUERY_DATASET = os.environ.get("BIGQUERY_DATASET", 'factor_matrix')
 EXECUTION_TIME = "{{ data_interval_start | ts_nodash }}"
 
 PYSPARK_JOB = {
@@ -29,7 +29,7 @@ PYSPARK_JOB = {
     'placement': {'cluster_name': CLUSTER_NAME},
     'pyspark_job': {'main_python_file_uri': PYSPARK_URI, 
         'args': [f"--input=gs://{BUCKET}/{EXECUTION_TIME}/processed/ratings.csv",
-        f"--output={EXECUTION_TIME}/model/"
+        f"--output=gs://{BUCKET}/{EXECUTION_TIME}/model/"
         ]
         }
 }
@@ -105,6 +105,11 @@ def preprocess_data(bucket, raw_input_object, output_folder):
     movie_dict_blob.upload_from_string(json.dumps(movie_dict), 'application/json')
 
 
+# def load_factor_matrix_to_json(input, output):
+
+
+
+
 default_args = {
     "owner": "airflow",
     "start_date": days_ago(1),
@@ -174,6 +179,21 @@ with DAG(
     #         },
     #     },
     # )
+    gcs_2_bq_ext = BigQueryCreateExternalTableOperator(
+        task_id=f'bq_user_factor_matrix_external_table_task',
+        table_resource={
+            'tableReference': {
+                'projectId': PROJECT_ID,
+                'datasetId': BIGQUERY_DATASET,
+                'tableId': f'user_factor',
+            },
+            'externalDataConfiguration':{
+                'autodetech': 'True',
+                'sourceFormat': 'JSON',
+                'sourceUris': [f'gs://{BUCKET}/{EXECUTION_TIME}/model/user_matrix/*']
+            }
+        }
+    )
 
     retrieve_data_task >> preprocess_data_task >> submit_job_task
     # download_dataset_task  >> local_to_gcs_task >> bigquery_external_table_task
