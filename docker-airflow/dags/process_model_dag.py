@@ -28,7 +28,9 @@ PYSPARK_JOB = {
     'reference': { 'project_id': PROJECT_ID},
     'placement': {'cluster_name': CLUSTER_NAME},
     'pyspark_job': {'main_python_file_uri': PYSPARK_URI, 
-        'args': [f"--input=gs://{BUCKET}/{EXECUTION_TIME}/processed/ratings.csv"]
+        'args': [f"--input=gs://{BUCKET}/{EXECUTION_TIME}/processed/ratings.csv",
+        f"--output=gs://{BUCKET}/{EXECUTION_TIME}/model/"
+        ]
         }
 }
 

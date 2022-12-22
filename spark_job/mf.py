@@ -300,11 +300,19 @@ class ALS:
 
 
 def main(params):
+    model = params.model
+    output = params.output
+    input = params.input
+    stepsize = params.stepsize
+    maxiter = params.maxiter
+    lambd = params.lambd
+    numfactor = params.numfactor
+
     spark = SparkSession\
         .builder\
         .getOrCreate()
     sc = spark.sparkContext
-    data = sc.textFile(params.input)
+    data = sc.textFile(input)
     header = data.first()
     data = data.filter(lambda x: x != header)
     originRDD = data.map(
@@ -315,29 +323,39 @@ def main(params):
 
     trainRDD, testRDD = originRDD.randomSplit([0.8,0.2], 42)
 
-    DSGDmodel = DSGD(step_size=0.0005, num_factor=10, max_iter=1, lambd=1)
-    DSGDmodel.train(sc, originRDD, trainRDD, testRDD)
-    print(DSGDmodel.get_test_rmse())
-    #print(type(DSGDmodel.get_user_factor_matrix()))
-    #print(json.dumps(DSGDmodel.get_user_factor_matrix()))
-    print(len(DSGDmodel.get_user_factor_matrix().keys()))
-    print(len(DSGDmodel.get_movie_factor_matrix().keys()))
+    if model == 'sgd':
+        model = DSGD(step_size=stepsize, num_factor=numfactor, max_iter=maxiter, lambd=lambd)
+    else:
+        model = ALS(num_factor=numfactor, max_iter=maxiter, lambd=lambd)
+    model.train(sc, originRDD, trainRDD, testRDD)
+    print(model.get_test_rmse())
 
-    ALSmodel = ALS(num_factor=10, max_iter=1, lambd=20)
-    ALSmodel.train(sc, originRDD, trainRDD, testRDD)
-    print(ALSmodel.get_test_rmse())
-    print(len(ALSmodel.get_user_factor_matrix().keys()))
-    print(len(ALSmodel.get_movie_factor_matrix().keys()))
+    spark.read.json(sc.parallelize([model.get_user_factor_matrix])).coalesce(1).write.mode('append').json(f'{output}user_matrix.json')
+
+    # DSGDmodel = DSGD(step_size=0.0005, num_factor=10, max_iter=1, lambd=1)
+    # DSGDmodel.train(sc, originRDD, trainRDD, testRDD)
+    # print(DSGDmodel.get_test_rmse())
+    # #print(type(DSGDmodel.get_user_factor_matrix()))
+    # #print(json.dumps(DSGDmodel.get_user_factor_matrix()))
+    # print(len(DSGDmodel.get_user_factor_matrix().keys()))
+    # print(len(DSGDmodel.get_movie_factor_matrix().keys()))
+
+    # ALSmodel = ALS(num_factor=10, max_iter=1, lambd=20)
+    # ALSmodel.train(sc, originRDD, trainRDD, testRDD)
+    # print(ALSmodel.get_test_rmse())
+    # print(len(ALSmodel.get_user_factor_matrix().keys()))
+    # print(len(ALSmodel.get_movie_factor_matrix().keys()))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='argument for spark jobs')
 
     parser.add_argument('--input', default='gs://movie_recommenders/20221218T143829/processed/ratings.csv')
-    parser.add_argument('--output', default='gs://movie_recommenders/20221218T143829/model_result/ratings.csv')
+    parser.add_argument('--output', default='gs://movie_recommenders/20221218T143829/model/')
     parser.add_argument('--model', default='sgd')
     parser.add_argument('--stepsize', type=float, default=0.01)
     parser.add_argument('--maxiter', type=int, default=0)
-    parser.add_argument('--lambda', type=float, default=1)
+    parser.add_argument('--lambd', type=float, default=1)
+    parser.add_argument('--numfactor', type=float, default=10)
 
     args = parser.parse_args()
     main(args)
