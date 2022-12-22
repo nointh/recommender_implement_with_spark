@@ -189,8 +189,8 @@ with DAG(
             },
             'externalDataConfiguration':{
                 'autodetech': 'True',
-                'sourceFormat': 'JSON',
-                'sourceUris': [f'gs://{BUCKET}/{EXECUTION_TIME}/model/user_matrix/*']
+                'sourceFormat': 'NEWLINE_DELIMITED_JSON',
+                'sourceUris': [f'gs://{BUCKET}/{EXECUTION_TIME}/model/user_matrix/*.json']
             }
         }
     )
