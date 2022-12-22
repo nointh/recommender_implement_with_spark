@@ -9,14 +9,14 @@ RUN apt-get update -qq && apt-get install unzip vim -qqq
 # git gcc g++ -qqq
 
 # Install OpenJDK-11
-# RUN apt update && \
-#     apt-get install -y openjdk-11-jdk && \
-#     apt-get install -y ant && \
-#     apt-get clean;
+RUN apt update && \
+    apt-get install -y openjdk-11-jdk && \
+    apt-get install -y ant && \
+    apt-get clean;
 
 # Set JAVA_HOME
-# ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64/
-# RUN export JAVA_HOME
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64/
+RUN export JAVA_HOME
 
 
 # Ref: https://airflow.apache.org/docs/docker-stack/recipes.html
