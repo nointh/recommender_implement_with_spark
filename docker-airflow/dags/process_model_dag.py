@@ -30,7 +30,7 @@ PYSPARK_JOB = {
     'placement': {'cluster_name': CLUSTER_NAME},
     'pyspark_job': {'main_python_file_uri': PYSPARK_URI, 
         'args': [f"--input=gs://{BUCKET}/{EXECUTION_TIME}/processed/ratings.csv",
-        f"--output={EXECUTION_TIME}/model/"
+        f"--output=gs://{BUCKET}/{EXECUTION_TIME}/model/"
         ]
         }
 }
@@ -38,8 +38,9 @@ PYSPARK_JOB = {
 engine = create_engine('postgresql+psycopg2://postgres:noi123456@noing-db.c2qkku433l07.ap-southeast-1.rds.amazonaws.com:5432/postgres')
 spark = SparkSession\
     .builder\
+    .config("spark.jars", "https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-hadoop3-latest.jar") \
     .getOrCreate()
-#spark._jsc.hadoopConfiguration().set('fs.gs.impl', 'com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem')
+spark._jsc.hadoopConfiguration().set('fs.gs.impl', 'com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem')
 # This is required if you are using service account and set true, 
 spark._jsc.hadoopConfiguration().set('fs.gs.auth.service.account.enable', 'true')
 spark._jsc.hadoopConfiguration().set('google.cloud.auth.service.account.json.keyfile', f"{GOOGLE_APPLICATION_CREDENTIALS}")
@@ -181,15 +182,15 @@ with DAG(
         project_id=PROJECT_ID
     )
 
-    # load_matrix_as_json_task = PythonOperator(
-    #     task_id="load_matrix_as_json",
-    #     python_callable=load_factor_matrix_to_json,
-    #     op_kwargs={
-    #         "bucket": BUCKET,
-    #         "input": f"gs://{BUCKET}/{EXECUTION_TIME}/model/*.json",
-    #         "output_folder": f"{EXECUTION_TIME}/matrix/"
-    #     },
-    # )
+    load_matrix_as_json_task = PythonOperator(
+        task_id="load_matrix_as_json",
+        python_callable=load_factor_matrix_to_json,
+        op_kwargs={
+            "bucket": BUCKET,
+            "input": f"gs://{BUCKET}/{EXECUTION_TIME}/model/*.json",
+            "output_folder": f"{EXECUTION_TIME}/matrix/"
+        },
+    )
     # bigquery_external_table_task = BigQueryCreateExternalTableOperator(
     #     task_id="bigquery_external_table_task",
     #     table_resource={
@@ -222,5 +223,5 @@ with DAG(
     #     }
     # )
 
-    retrieve_data_task >> preprocess_data_task >> submit_job_task 
+    retrieve_data_task >> preprocess_data_task >> submit_job_task >> load_matrix_as_json_task
     # download_dataset_task  >> local_to_gcs_task >> bigquery_external_table_task

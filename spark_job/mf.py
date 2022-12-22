@@ -332,15 +332,15 @@ def main(params):
     print(model.get_test_rmse())
 
 
-    bucket_name = 'movie_recommenders'
-    bucket = storage.Client().get_bucket(bucket_name)
+    # bucket_name = 'movie_recommenders'
+    # bucket = storage.Client().get_bucket(bucket_name)
 
-    blob = bucket.blob(f'{output}user_matrix.json')
-    blob.upload_from_string(data=json.dumps(model.get_user_factor_matrix()),content_type='application/json')  
+    # blob = bucket.blob(f'{output}user_matrix.json')
+    # blob.upload_from_string(data=json.dumps(model.get_user_factor_matrix()),content_type='application/json')  
     #user_maxtrix = [(key, val) for key, val in model.get_user_factor_matrix().items()]
     #user_matrix_df = spark.createDataFrame(data=user_maxtrix, schema = ["user","array"])
     #user_matrix_df.write.format('bigquery').option('table','factor_matrix.staging').mode('overwrite')
-    #spark.read.json(sc.parallelize([model.get_user_factor_matrix()])).coalesce(1).write.mode('append').json(f'{output}user_matrix')
+    spark.read.json(sc.parallelize([model.get_user_factor_matrix()])).coalesce(1).write.mode('append').json(f'{output}user_matrix')
 
     # DSGDmodel = DSGD(step_size=0.0005, num_factor=10, max_iter=1, lambd=1)
     # DSGDmodel.train(sc, originRDD, trainRDD, testRDD)
