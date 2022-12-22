@@ -39,7 +39,7 @@ engine = create_engine('postgresql+psycopg2://postgres:noi123456@noing-db.c2qkku
 spark = SparkSession\
     .builder\
     .getOrCreate()
-spark._jsc.hadoopConfiguration().set('fs.gs.impl', 'com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem')
+#spark._jsc.hadoopConfiguration().set('fs.gs.impl', 'com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem')
 # This is required if you are using service account and set true, 
 spark._jsc.hadoopConfiguration().set('fs.gs.auth.service.account.enable', 'true')
 spark._jsc.hadoopConfiguration().set('google.cloud.auth.service.account.json.keyfile', f"{GOOGLE_APPLICATION_CREDENTIALS}")
