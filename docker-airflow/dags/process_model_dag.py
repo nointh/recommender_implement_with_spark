@@ -11,6 +11,7 @@ from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateExte
 from airflow.providers.google.cloud.operators.dataproc import DataprocSubmitJobOperator
 import pyarrow.csv as pv
 import pyarrow.parquet as pq
+from pyspark.sql import SparkSession
 from sqlalchemy import create_engine, text
 import pandas as pd
 import io
@@ -35,6 +36,9 @@ PYSPARK_JOB = {
 }
 
 engine = create_engine('postgresql+psycopg2://postgres:noi123456@noing-db.c2qkku433l07.ap-southeast-1.rds.amazonaws.com:5432/postgres')
+spark = SparkSession\
+    .builder\
+    .getOrCreate()
 
 # def format_to_parquet(src_file):
 #     if not src_file.endswith('.csv'):
@@ -105,8 +109,14 @@ def preprocess_data(bucket, raw_input_object, output_folder):
     movie_dict_blob.upload_from_string(json.dumps(movie_dict), 'application/json')
 
 
-# def load_factor_matrix_to_json(input, output):
-
+def load_factor_matrix_to_json(input, output_folder, bucket):
+    sc = spark.sparkContext
+    user_factor_matrix = sc.wholeTextFiles(input).values().map(json.loads)
+    print(user_factor_matrix)
+    client = storage.Client()
+    bucket = client.bucket(bucket)
+    user_dict_blob = bucket.blob(output_folder+ 'user_dict.json')
+    user_dict_blob.upload_from_string(json.dumps(user_factor_matrix), 'application/json')
 
 
 
@@ -165,6 +175,16 @@ with DAG(
         region='us-central1',
         project_id=PROJECT_ID
     )
+
+    load_matrix_as_json_task = PythonOperator(
+        task_id="load_matrix_as_json",
+        python_callable=load_factor_matrix_to_json,
+        op_kwargs={
+            "bucket": BUCKET,
+            "input": f"gs://{BUCKET}/{EXECUTION_TIME}/model/*.json",
+            "output_folder": f"{EXECUTION_TIME}/matrix/"
+        },
+    )
     # bigquery_external_table_task = BigQueryCreateExternalTableOperator(
     #     task_id="bigquery_external_table_task",
     #     table_resource={
@@ -179,21 +199,23 @@ with DAG(
     #         },
     #     },
     # )
-    gcs_2_bq_ext = BigQueryCreateExternalTableOperator(
-        task_id=f'bq_user_factor_matrix_external_table_task',
-        table_resource={
-            'tableReference': {
-                'projectId': PROJECT_ID,
-                'datasetId': BIGQUERY_DATASET,
-                'tableId': f'user_factor',
-            },
-            'externalDataConfiguration':{
-                'autodetech': 'True',
-                'sourceFormat': 'NEWLINE_DELIMITED_JSON',
-                'sourceUris': [f'gs://{BUCKET}/{EXECUTION_TIME}/model/user_matrix/*.json']
-            }
-        }
-    )
 
-    retrieve_data_task >> preprocess_data_task >> submit_job_task >> gcs_2_bq_ext
+
+    # gcs_2_bq_ext = BigQueryCreateExternalTableOperator(
+    #     task_id=f'bq_user_factor_matrix_external_table_task',
+    #     table_resource={
+    #         'tableReference': {
+    #             'projectId': PROJECT_ID,
+    #             'datasetId': BIGQUERY_DATASET,
+    #             'tableId': f'user_factor',
+    #         },
+    #         'externalDataConfiguration':{
+    #             'autodetech': 'True',
+    #             'sourceFormat': 'NEWLINE_DELIMITED_JSON',
+    #             'sourceUris': [f'gs://{BUCKET}/{EXECUTION_TIME}/model/user_matrix/*.json']
+    #         }
+    #     }
+    # )
+
+    retrieve_data_task >> preprocess_data_task >> submit_job_task
     # download_dataset_task  >> local_to_gcs_task >> bigquery_external_table_task
