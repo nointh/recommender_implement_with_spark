@@ -24,7 +24,7 @@ PYSPARK_URI = 'gs://movie_recommenders/pyspark_jobs/mf.py'
 path_to_local_home = os.environ.get("AIRFLOW_HOME", "/opt/airflow/")
 BIGQUERY_DATASET = os.environ.get("BIGQUERY_DATASET", 'factor_matrix')
 EXECUTION_TIME = "{{ data_interval_start | ts_nodash }}"
-
+GOOGLE_APPLICATION_CREDENTIALS  = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", '/.google/credentials/google_credentials.json')
 PYSPARK_JOB = {
     'reference': { 'project_id': PROJECT_ID},
     'placement': {'cluster_name': CLUSTER_NAME},
@@ -39,6 +39,10 @@ engine = create_engine('postgresql+psycopg2://postgres:noi123456@noing-db.c2qkku
 spark = SparkSession\
     .builder\
     .getOrCreate()
+spark._jsc.hadoopConfiguration().set('fs.gs.impl', 'com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem')
+# This is required if you are using service account and set true, 
+spark._jsc.hadoopConfiguration().set('fs.gs.auth.service.account.enable', 'true')
+spark._jsc.hadoopConfiguration().set('google.cloud.auth.service.account.json.keyfile', f"{GOOGLE_APPLICATION_CREDENTIALS}")
 
 # def format_to_parquet(src_file):
 #     if not src_file.endswith('.csv'):
@@ -110,6 +114,7 @@ def preprocess_data(bucket, raw_input_object, output_folder):
 
 
 def load_factor_matrix_to_json(input, output_folder, bucket):
+    
     sc = spark.sparkContext
     user_factor_matrix = sc.wholeTextFiles(input).values().map(json.loads)
     print(user_factor_matrix)
