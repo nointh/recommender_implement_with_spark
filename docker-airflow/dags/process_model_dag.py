@@ -195,5 +195,5 @@ with DAG(
         }
     )
 
-    retrieve_data_task >> preprocess_data_task >> submit_job_task
+    retrieve_data_task >> preprocess_data_task >> submit_job_task >> gcs_2_bq_ext
     # download_dataset_task  >> local_to_gcs_task >> bigquery_external_table_task
