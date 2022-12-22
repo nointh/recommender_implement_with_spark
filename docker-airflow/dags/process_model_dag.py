@@ -12,6 +12,7 @@ from airflow.providers.google.cloud.operators.dataproc import DataprocSubmitJobO
 import pyarrow.csv as pv
 import pyarrow.parquet as pq
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
 from sqlalchemy import create_engine, text
 import pandas as pd
 import io
@@ -23,7 +24,7 @@ CLUSTER_NAME = os.environ.get("GCP_CLUSTER_NAME", 'hadoopcluster')
 PYSPARK_URI = 'gs://movie_recommenders/pyspark_jobs/mf.py'
 path_to_local_home = os.environ.get("AIRFLOW_HOME", "/opt/airflow/")
 BIGQUERY_DATASET = os.environ.get("BIGQUERY_DATASET", 'factor_matrix')
-EXECUTION_TIME = "{{ data_interval_start | ts_nodash }}"
+EXECUTION_TIME = "{{ dag_run.logical_date | ts_nodash }}"
 GOOGLE_APPLICATION_CREDENTIALS  = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", '/.google/credentials/google_credentials.json')
 PYSPARK_JOB = {
     'reference': { 'project_id': PROJECT_ID},
@@ -36,14 +37,6 @@ PYSPARK_JOB = {
 }
 
 engine = create_engine('postgresql+psycopg2://postgres:noi123456@noing-db.c2qkku433l07.ap-southeast-1.rds.amazonaws.com:5432/postgres')
-spark = SparkSession\
-    .builder\
-    .config("spark.jars", "https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-hadoop3-latest.jar") \
-    .getOrCreate()
-spark._jsc.hadoopConfiguration().set('fs.gs.impl', 'com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem')
-# This is required if you are using service account and set true, 
-spark._jsc.hadoopConfiguration().set('fs.gs.auth.service.account.enable', 'true')
-spark._jsc.hadoopConfiguration().set('google.cloud.auth.service.account.json.keyfile', f"{GOOGLE_APPLICATION_CREDENTIALS}")
 
 # def format_to_parquet(src_file):
 #     if not src_file.endswith('.csv'):
@@ -114,17 +107,50 @@ def preprocess_data(bucket, raw_input_object, output_folder):
     movie_dict_blob.upload_from_string(json.dumps(movie_dict), 'application/json')
 
 
-def load_factor_matrix_to_json(input, output_folder, bucket):
-    
-    sc = spark.sparkContext
-    user_factor_matrix = sc.wholeTextFiles(input).values().map(json.loads)
-    print(user_factor_matrix)
+def load_factor_matrix_to_json(input, folder, bucket):
+    spark = SparkSession\
+        .builder\
+        .config("spark.jars", "https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-hadoop3-latest.jar") \
+        .getOrCreate()
+    spark._jsc.hadoopConfiguration().set('fs.gs.impl', 'com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem')
+    # This is required if you are using service account and set true, 
+    spark._jsc.hadoopConfiguration().set('fs.gs.auth.service.account.enable', 'true')
+    spark._jsc.hadoopConfiguration().set('google.cloud.auth.service.account.json.keyfile', f"{GOOGLE_APPLICATION_CREDENTIALS}")
     client = storage.Client()
     bucket = client.bucket(bucket)
-    user_dict_blob = bucket.blob(output_folder+ 'user_matrix.json')
-    user_dict_blob.upload_from_string(json.dumps(user_factor_matrix), 'application/json')
+    # user_factor_matrix = sc.wholeTextFiles(input).values().map(json.loads)
+    u_mapper_blob = bucket.blob(f'{folder}processed/user_dict.json')
+    u_mapper_r = json.loads(u_mapper_blob.download_as_string())
+    u_mapper = {val: key for key, val in u_mapper_r.items()}
+    print(u_mapper)
+    user_df = spark.read.json(f'{input}user_matrix/*')
+    user_df.printSchema()
+    user_df.show()
+    user_rdd = user_df.select(col('user'), col('array')).rdd
+    print(user_rdd)
+    print(user_rdd.collect())
+    user_factor_matrix = {u_mapper.get(row['user'], 0): row['array'] for row in user_rdd.collect()}
+    print(user_factor_matrix)
 
+    u_matrix_blob = bucket.blob(f'{folder}matrix/user_matrix.json')
+    u_matrix_blob.upload_from_string(json.dumps(user_factor_matrix), 'application/json')
 
+    ## Movie save factor matrix
+    m_mapper_blob = bucket.blob(f'{folder}processed/movie_dict.json')
+    m_mapper_r = json.loads(m_mapper_blob.download_as_string())
+    m_mapper = {val: key for key, val in m_mapper_r.items()}
+    print(m_mapper)
+    movie_df = spark.read.json(f'{input}movie_matrix/*')
+    movie_df.printSchema()
+    movie_df.show()
+    movie_rdd = movie_df.select(col('movie'), col('array')).rdd
+    print(movie_rdd)
+    print(movie_rdd.collect())
+    movie_factor_matrix = {m_mapper.get(row['movie'], 0): row['array'] for row in movie_rdd.collect()}
+    print(movie_factor_matrix)
+
+    m_matrix_blob = bucket.blob(f'{folder}matrix/movie_matrix.json')
+    m_matrix_blob.upload_from_string(json.dumps(movie_factor_matrix), 'application/json')
 
 default_args = {
     "owner": "airflow",
@@ -187,8 +213,8 @@ with DAG(
         python_callable=load_factor_matrix_to_json,
         op_kwargs={
             "bucket": BUCKET,
-            "input": f"gs://{BUCKET}/{EXECUTION_TIME}/model/*.json",
-            "output_folder": f"{EXECUTION_TIME}/matrix/"
+            "input": f"gs://{BUCKET}/{EXECUTION_TIME}/model/",
+            "folder": f"{EXECUTION_TIME}/"
         },
     )
     # bigquery_external_table_task = BigQueryCreateExternalTableOperator(
