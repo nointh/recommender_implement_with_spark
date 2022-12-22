@@ -115,7 +115,7 @@ def load_factor_matrix_to_json(input, output_folder, bucket):
     print(user_factor_matrix)
     client = storage.Client()
     bucket = client.bucket(bucket)
-    user_dict_blob = bucket.blob(output_folder+ 'user_dict.json')
+    user_dict_blob = bucket.blob(output_folder+ 'user_matrix.json')
     user_dict_blob.upload_from_string(json.dumps(user_factor_matrix), 'application/json')
 
 
@@ -217,5 +217,5 @@ with DAG(
     #     }
     # )
 
-    retrieve_data_task >> preprocess_data_task >> submit_job_task
+    retrieve_data_task >> preprocess_data_task >> submit_job_task >>load_matrix_as_json_task
     # download_dataset_task  >> local_to_gcs_task >> bigquery_external_table_task
