@@ -27,7 +27,7 @@ OUTPUT_FOlDER= AIRFLOW_HOME + '/' + DATASET_NAME
 TABLE_NAME_TEMPLATE = "yellow_taxi_{{(execution_date.replace(day = 28) - macros.timedelta(days=90)).strftime(\'%Y_%m\')}}"
 
 engine = create_engine('postgresql+psycopg2://postgres:noi123456@noing-db.c2qkku433l07.ap-southeast-1.rds.amazonaws.com:5432/postgres')
-payload = {'userName': 'noing', 'password': 'noi06122001'}
+payload = {'userName': 'noing', 'password': '123456'}
 session = requests.Session()
 session.post('https://movielens.org/api/sessions', json=payload)
 

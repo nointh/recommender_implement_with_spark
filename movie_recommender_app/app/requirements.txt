@@ -1,1 +1,4 @@
 Flask
+sqlalchemy
+psycopg2-binary
+Flask-Session

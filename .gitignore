@@ -3,3 +3,4 @@ logs/
 .env/
 env/
 .ipynb_checkpoints
+flask_session/
