@@ -8,10 +8,11 @@ from app.repository import Repository
 @app.route('/index')
 def index():
     repository = Repository()
-    movies = repository.get_movies(limit=10)
-    top_rating_movies = repository.get_top_rating_movie(limit=10)
-    latest_movies = repository.get_latest_movies(limit=10)
-    return render_template('index.html', movies=movies, top_rating_movies=top_rating_movies, latest_movies=latest_movies)
+    movies = repository.get_movies(limit=12)
+    top_rating_movies = repository.get_top_rating_movie(limit=12)
+    latest_movies = repository.get_latest_movies(limit=12)
+    cartoons = repository.get_cartoon_movie(limit=12)
+    return render_template('index.html', movies=movies, top_rating_movies=top_rating_movies, latest_movies=latest_movies, cartoons=cartoons)
 
 @app.route('/about')
 def about():
@@ -25,7 +26,8 @@ def detail(id):
         abort(404)
     rating = repository.get_average_rating_movie_by_id(id)
     genres = repository.get_genres_by_id(id)
-    return render_template('detail.html', movie=movie, rating=rating, genres=genres)
+    stars = repository.get_star_rating_movie_by_id(id)
+    return render_template('detail.html', movie=movie, rating=rating, genres=genres, stars=stars)
 
 @app.route('/category')
 def category():

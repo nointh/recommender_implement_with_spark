@@ -13,8 +13,8 @@ class Repository:
         else:
             return None
     
-    def get_movies(self, limit=10):
-        movies = self.db_session.query(Movie).limit(10).all()
+    def get_movies(self, limit=12):
+        movies = self.db_session.query(Movie).limit(limit).all()
         return movies
     
     def get_movie_by_id(self, id):
@@ -32,14 +32,14 @@ class Repository:
 
     def get_top_rating_movie(self, limit=12):
         #get top rating movieID and average rating --> list[(movieId,avgRating),...]
-        top_rating_moiveID = self.db_session.query(Rating.movieId, func.avg(Rating.rating).label('avgRating'),).group_by(Rating.movieId).order_by(desc('avgRating')).limit(12).all()
+        top_rating_moiveID = self.db_session.query(Rating.movieId, func.avg(Rating.rating).label('avgRating'),).group_by(Rating.movieId).order_by(desc('avgRating')).limit(limit).all()
         movies = []
         for i in top_rating_moiveID:
             movies.append(self.get_movie_by_id(i.movieId))
         return movies
 
     def get_latest_movies(self, limit=12):
-        lastest_movies = self.db_session.query(Movie).order_by(Movie.releaseDate.desc()).filter(Movie.releaseDate != "None" and Movie.releaseDate != "").limit(12).all()
+        lastest_movies = self.db_session.query(Movie).order_by(Movie.releaseDate.desc()).filter(Movie.releaseDate != "None" and Movie.releaseDate != "").limit(limit).all()
         return lastest_movies
     
     def get_average_rating_movie_by_id(self, id):
@@ -60,4 +60,22 @@ class Repository:
 
     def get_director_by_id(self, id):
         directors = self.db_session.query(Directors).filter(Directors.movieId==id).all()
-        return directors
+        return directors 
+    
+    def get_cartoon_movie(self, limit=12):
+        cartoons = self.db_session.query(Movie).join(Genres, Movie.movieId==Genres.movieId).filter(Genres.genre=='Animation').limit(limit).all()
+        return cartoons
+
+    def get_star_rating_movie_by_id(self,id):
+        ratings = self.db_session.query(Rating.rating).filter(Rating.movieId==id).all()
+        list_rating = list(*zip(*ratings))
+        result = []
+        #result = [(1 star, ratio %, number of 1 star), ..., (5 star, ratio %, number of 5 star), number of vote]
+        for i in range(5):
+            star = i+1
+            ratio = round((list_rating.count(i+0.5)/len(list_rating))*100,2)+round((list_rating.count(i+1)/len(list_rating))*100,2)
+            count = list_rating.count(i+0.5)+list_rating.count(i+1)
+            tuple_temp = (star,ratio,count) 
+            result.append(tuple_temp)
+        result.append(len(list_rating))
+        return result
