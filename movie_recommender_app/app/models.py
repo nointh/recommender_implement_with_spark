@@ -41,7 +41,7 @@ class Directors(Base):
     movieId = Column(Integer, primary_key=True)
     director = Column(String, primary_key=True)
 
-class Actor(Base):
+class Actors(Base):
     __tablename__ = 'actors'
     movieId = Column(Integer, primary_key=True)
     actor = Column(String, primary_key=True)

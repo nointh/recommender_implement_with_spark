@@ -23,7 +23,9 @@ def detail(id):
     movie = repository.get_movie_by_id(id)
     if not movie:
         abort(404)
-    return render_template('detail.html', movie=movie)
+    rating = repository.get_average_rating_movie_by_id(id)
+    genres = repository.get_genres_by_id(id)
+    return render_template('detail.html', movie=movie, rating=rating, genres=genres)
 
 @app.route('/category')
 def category():
