@@ -9,7 +9,9 @@ from app.repository import Repository
 def index():
     repository = Repository()
     movies = repository.get_movies(limit=10)
-    return render_template('index.html', movies=movies)
+    top_rating_movies = repository.get_top_rating_movie(limit=10)
+    latest_movies = repository.get_latest_movies(limit=10)
+    return render_template('index.html', movies=movies, top_rating_movies=top_rating_movies, latest_movies=latest_movies)
 
 @app.route('/about')
 def about():

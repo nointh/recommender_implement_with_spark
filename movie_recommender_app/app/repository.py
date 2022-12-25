@@ -29,3 +29,14 @@ class Repository:
         if result:
             return True
         else: return False
+
+    def get_top_rating_movie(self, limit=12):
+        top_rating_moiveID = self.db_session.query(Rating.movieId).order_by(Rating.rating).limit(12).all()
+        movies = []
+        for i in top_rating_moiveID:
+            movies.append(self.get_movie_by_id(i.movieId))
+        return movies
+
+    def get_latest_movies(self, limit=12):
+        lastest_movies = self.db_session.query(Movie).order_by(Movie.releaseDate.desc()).filter(Movie.releaseDate != "None" and Movie.releaseDate != "").limit(12).all()
+        return lastest_movies
