@@ -67,7 +67,7 @@ x-airflow-common:
     PG_PASSWORD: "${PG_PASSWORD}"
     PG_DATABASE: "${PG_DATABASE}"
     PG_PORT: "${PG_PORT}"
-    BIGQUERY_DATASET: "factor_matrix"
+    BIGQUERY_DATASET: "recommenders"
 
     GCP_PROJECT_ID: 'sonorous-reach-371710'
     GCP_GCS_BUCKET: "movie_recommenders"

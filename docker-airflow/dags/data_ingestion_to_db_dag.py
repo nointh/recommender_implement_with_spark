@@ -95,6 +95,9 @@ def load_and_scrap_movie_data():
     language_df.to_sql('languages', engine, if_exists='replace', index=False)
     director_df.to_sql('directors', engine, if_exists='replace', index=False)
     actor_df.to_sql('actors', engine, if_exists='replace', index=False)
+    print(language_df.head(5))
+    print(director_df.head(5))
+    print(actor_df.head(5))
 
 def generate_users_data():
     ratings_df = pd.read_csv(f'{OUTPUT_FOlDER}/ratings.csv', sep=',')
