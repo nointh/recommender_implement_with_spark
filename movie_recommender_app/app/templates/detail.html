@@ -32,7 +32,7 @@
                      <li class="list-info-group-item"><span>Trạng Thái</span> : <span class="quality">HD</span><span
                            class="episode">Vietsub</span></li>
                      <li class="list-info-group-item">
-                        <span>Rating</span> : <span class="imdb">4.3/5</span>
+                        <span>Rating</span> : <span class="imdb">{{rating}}/5.0</span>
                         <!-- Rating -->
                         <button style="color: black; background: #FFC007" class="open-button" onclick="openForm()">Rate</button>
 
@@ -48,11 +48,14 @@
                               <input class="btn-submit-rate" type="submit">
                            </form>
                         </div>
-                        <!--  -->
+                        <!-- Genres -->
                      </li>
-                     <li class="list-info-group-item"><span>Genre</span> : <a href="" rel="category tag">Chiếu
-                           Rạp</a>, <a href="" rel="category tag">Hành động</a>, <a href="" rel="category tag">Phiêu
-                           Lưu</a>, <a href="" rel="category tag">Viễn Tưởng</a></li>
+                     <li class="list-info-group-item">
+                        <span>Genre</span> :
+                        {% for genre in genres %}
+                           <a href="" rel="category tag">{{genre.genre}}, </a>
+                        {% endfor %}
+                        </li>
                      <li class="list-info-group-item"><span>Language</span> : <a href="" rel="tag">Mỹ</a></li>
                      <li class="list-info-group-item"><span>Director</span> : <a class="director" rel="nofollow"
                            href="https://phimhay.co/dao-dien/cate-shortland" title="James Cameron">James Cameron</a>
