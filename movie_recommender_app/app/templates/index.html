@@ -16,8 +16,26 @@
               <li class="section-btn halim_ajax_get_post" data-catid="4" data-showpost="12" data-widgetid="halim-advanced-widget-4" data-layout="6col"><span data-text="Chiếu Rạp"></span></li>
            </ul>
         </div>
+        
         <div id="halim-advanced-widget-4-ajax-box" class="halim_box">
-           <article class="col-md-2 col-sm-4 col-xs-6 thumb grid-item post-38424">
+         {% for movie in movies %}
+            <article class="col-md-2 col-sm-4 col-xs-6 thumb grid-item post-38424">
+              <div class="halim-item">
+                 <a class="halim-thumb" style='overflow: hidden;' href="/detail/{{ movie.movieId }}" title="{{movie.title}}">
+                    <img class="lazy img-responsive" src="https://image.tmdb.org/t/p/w200{{movie.posterPath}}" alt="{{movie.title}}" title="{{movie.title}}">
+                    <span class="status">HD</span><span class="episode"><i class="fa fa-play" aria-hidden="true"></i>Vietsub</span> 
+                    <div class="icon_overlay"></div>
+                    <div class="halim-post-title-box">
+                       <div class="halim-post-title ">
+                          <p class="entry-title">{{movie.title}}</p>
+
+                       </div>
+                    </div>
+                 </a>
+              </div>
+           </article>
+           {% endfor %}
+           <!-- <article class="col-md-2 col-sm-4 col-xs-6 thumb grid-item post-38424">
               <div class="halim-item">
                  <a class="halim-thumb" href="chitiet.html" title="Avatar: The Way of Water">
                     <img class="lazy img-responsive" src="/img/avatar2.jpeg" alt="Avatar: The Way of Water" title="Avatar: The Way of Water">
@@ -91,22 +109,7 @@
                     </div>
                  </a>
               </div>
-           </article>
-           <article class="col-md-2 col-sm-4 col-xs-6 thumb grid-item post-38424">
-              <div class="halim-item">
-                 <a class="halim-thumb" href="chitiet.html" title="Avatar: The Way of Water">
-                    <img class="lazy img-responsive" src="/img/avatar2.jpeg" alt="Avatar: The Way of Water" title="Avatar: The Way of Water">
-                    <span class="status">HD</span><span class="episode"><i class="fa fa-play" aria-hidden="true"></i>Vietsub</span> 
-                    <div class="icon_overlay"></div>
-                    <div class="halim-post-title-box">
-                       <div class="halim-post-title ">
-                          <p class="entry-title">Avatar: The Way of Water</p>
-
-                       </div>
-                    </div>
-                 </a>
-              </div>
-           </article>
+           </article> -->
          
           
         </div>

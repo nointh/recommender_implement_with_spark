@@ -28,7 +28,7 @@
       <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
      
       <link rel='dns-prefetch' href='//s.w.org' />
-      
+      <link rel='stylesheet' id='style-css' href={{url_for('static', filename='css/rating.css')}} media='all' />
       <link rel='stylesheet' id='bootstrap-css' href={{url_for('static', filename='css/bootstrap.min.css')}} media='all' />
       <link rel='stylesheet' id='style-css' href={{url_for('static', filename='css/style.css')}} media='all' />
       <link rel='stylesheet' id='wp-block-library-css' href={{url_for('static', filename='css/style.min.css')}} media='all' />
@@ -63,10 +63,18 @@
                   </div>
                </div>
                <div class="col-md-4 hidden-xs">
-                  <div id="get-bookmark" class="box-shadow"><i class="hl-bookmark"></i><span> {{session['username']}}</span><span class="count">0</span></div>
-                  <div id="bookmark-list" class="hidden bookmark-list-on-pc">
-                     <ul style="margin: 0;"></ul>
+                  {% if session['username'] %}
+                  <div id="get-bookmark" class="box-shadow"><span> {{session['username'] or login}}</span>
+                     <!-- <span class="count">0</span> -->
                   </div>
+                  <div id="get-bookmark" class="box-shadow"><a href="/logout">LOG OUT</a></div>
+                  <div id="bookmark-list" class="hidden bookmark-list-on-pc">
+                     <ul style="margin: 0;">
+                     </ul>
+                  </div>
+                  {% else %}
+                  <div id="get-bookmark" class="box-shadow"><a href="/login">LOG IN</a></div>
+                  {% endif %}
                </div>
             </div>
          </div>
