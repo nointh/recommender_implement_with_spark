@@ -44,7 +44,7 @@ def rate(movie):
     new_rating = request.form.get('rating')
     userId = session['user_id']
     movieId = movie
-    rating = repository.get_rating_by_user_movie(userId=userId, movieId=movieId)
+    rating = repository.get_rating_object_by_user_movie(userId=userId, movieId=movieId)
     if rating:
         repository.update_rating(rating=rating, new_rating=new_rating)
     else:

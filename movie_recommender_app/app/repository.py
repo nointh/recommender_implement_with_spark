@@ -39,6 +39,12 @@ class Repository:
             return None
         return rating
     
+    def get_rating_object_by_user_movie(self, userId, movieId):
+        rating = self.db_session.query(Rating).filter(Rating.movieId == movieId and Rating.userId == userId).first()
+        if not rating:
+            return None
+        return rating
+    
     def add_rating(self, userId, movieId, rating):
         rating = Rating(userId=userId, movieId=movieId, rating=rating)
         result = self.db_session.add(rating)
