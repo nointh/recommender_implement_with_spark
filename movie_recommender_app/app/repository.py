@@ -83,24 +83,35 @@ class Repository:
         return round(avgRating_movie[0],1)
 
     def get_genres_by_id(self, id):
-        genres = self.db_session.query(Genres).filter(Genres.movieId==id).all()
-        return genres
+        movie = self.get_movie_by_id(id)
+        return movie.get_genres()
+        # genres = self.db_session.query(Genres).filter(Genres.movieId==id).all()
+        # return genres
 
     def get_laguage_movie_by_id(self, id):
-        languages = self.db_session.query(Languages).filter(Languages.movieId==id).all()
-        return languages
+        movie = self.get_movie_by_id(id)
+        return movie.get_languages()
+        # languages = self.db_session.query(Languages).filter(Languages.movieId==id).all()
+        # return languages
 
     def get_actors_by_id(self, id):
-        actors = self.db_session.query(Actors).filter(Actors.movieId==id).all()
-        return actors
+        movie = self.get_movie_by_id(id)
+        return movie.get_actors()
+        # actors = self.db_session.query(Actors).filter(Actors.movieId==id).all()
+        # return actors
 
     def get_director_by_id(self, id):
-        directors = self.db_session.query(Directors).filter(Directors.movieId==id).all()
-        return directors 
+        movie = self.get_movie_by_id(id)
+        return movie.get_directors()
+        # directors = self.db_session.query(Directors).filter(Directors.movieId==id).all()
+        # return directors 
     
     def get_cartoon_movie(self, limit=12):
-        cartoons = self.db_session.query(Movie).join(Genres, Movie.movieId==Genres.movieId).filter(Genres.genre=='Animation').limit(limit).all()
+        # cartoons = self.db_session.query(Movie).join(Genres, Movie.movieId==Genres.movieId).filter(Genres.genre=='Animation').limit(limit).all()
+        # return cartoons
+        cartoons = self.db_session.query(Movie).filter('Animation' in Movie.genres).limit(limit).all()
         return cartoons
+
 
     def get_star_rating_movie_by_id(self,id):
         ratings = self.db_session.query(Rating.rating).filter(Rating.movieId==id).all()

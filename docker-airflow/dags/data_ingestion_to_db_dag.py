@@ -52,7 +52,7 @@ def get_themoviedb_data(id):
     movie_data['plotSummary'] = movie_data.get('overview', '')
     movie_data['releaseDate'] = movie_data.get('release_date', '')
     movie_data['posterPath'] = movie_data.get('poster_path', '')
-    movie_data['languages'] = movie_data.get('spoken_languages', '')
+    movie_data['languages'] = movie_data.get('spoken_languages', [])
     movie_data['genres'] = map(lambda x: x.get('name', ''), movie_data.get('genres', []))
     movie_data['releaseYear'] = movie_data.get('release_date', '')[:4]
     return movie_data
@@ -82,9 +82,9 @@ def load_and_scrap_movie_data():
         fully_movie.loc[i, 'releaseDate'] = movie_data.get('releaseDate', '')
         fully_movie.loc[i, 'title'] = movie_data.get('title', '')
         fully_movie.loc[i, 'mpaa'] = movie_data.get('mpaa','')
-        fully_movie.loc[i, 'languages'] = ''.join(movie_data.get('languages', []))
-        fully_movie.loc[i, 'directors'] = ''.join(movie_data.get('directors', []))
-        fully_movie.loc[i, 'actors'] = ''.join(movie_data.get('actors', []))
+        fully_movie.loc[i, 'languages'] = '|'.join(movie_data.get('languages', []))
+        fully_movie.loc[i, 'directors'] = '|'.join(movie_data.get('directors', []))
+        fully_movie.loc[i, 'actors'] = '|'.join(movie_data.get('actors', []))
         # for genre in movie_data.get('genres', []):
         #     genre_df = genre_df.append({'movieId': movie_id, 'genre': genre}, ignore_index=True)
         # for language in movie_data.get('languages', []):
