@@ -129,12 +129,12 @@ def load_movie_data():
 
 def load_rating_data():
     ratings_df = pd.read_csv(f'{OUTPUT_FOlDER}/ratings.csv', sep=',')
-    # ratings_df['timestamp'] = pd.to_datetime(ratings_df['timestamp'], unit='s')
+    ratings_df['timestamp'] = pd.to_datetime(ratings_df['timestamp'], unit='s')
     ratings_df.to_sql('ratings', engine, if_exists='replace', index=False)
 
 def load_tag_data():
     tags_df = pd.read_csv(f'{OUTPUT_FOlDER}/tags.csv', sep=',')
-    # tags_df['timestamp'] = pd.to_datetime(tags_df['timestamp'], unit='s')
+    tags_df['timestamp'] = pd.to_datetime(tags_df['timestamp'], unit='s')
     tags_df.to_sql('tags', engine, if_exists='replace', index=False)
 
 default_args = {

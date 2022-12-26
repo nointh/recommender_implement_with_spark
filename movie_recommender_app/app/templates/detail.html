@@ -294,7 +294,7 @@
                      <figure><img class="lazy img-responsive"
                            src="https://image.tmdb.org/t/p/w200{{movie.posterPath}}"
                            alt="{{movie.title}}" title="{{ movie.title }}"></figure>
-                     <span class="status">{{movie.mpaa | HD}}</span><span class="episode"><i class="fa fa-play"
+                     <span class="status">{{movie.mpaa or 'HD'}}</span><span class="episode"><i class="fa fa-play"
                            aria-hidden="true"></i>{{movie.releaseYear}}</span>
                      <div class="icon_overlay"></div>
                      <div class="halim-post-title-box">

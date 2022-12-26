@@ -27,7 +27,7 @@ def detail(id):
     rating = repository.get_average_rating_movie_by_id(id)
     genres = repository.get_genres_by_id(id)
     stars = repository.get_star_rating_movie_by_id(id)
-    if session['user_id']:
+    if session.get('user_id'):
         self_rating = repository.get_rating_by_user_movie(movieId=id, userId=session.get('user_id')) if session.get('user_id') else None
         pred_rating = repository.get_rating_predict(movieId=id, userId=session.get('user_id')) if session.get('user_id') else None
 
@@ -38,7 +38,7 @@ def detail(id):
 @app.route('/rate/<int:movie>', methods=['POST'])
 def rate(movie):
     repository = Repository()
-    if not session['user_id']:
+    if not session.get('user_id'):
         return redirect('/login')
     new_rating = float(request.form.get('rating'))
     userId = session['user_id']

@@ -56,6 +56,7 @@ class Repository:
     def get_rating_predict(self, userId, movieId):
         sql_query = f'select predict from `sonorous-reach-371710.recommenders.mf_recommender` where user = {userId} and movie = {movieId} limit 1'
         query_job = self.bq_client.query(sql_query)
+        pred = 0
         for row in query_job.result():
             pred = row[0]
         return pred
@@ -88,9 +89,9 @@ class Repository:
         # genres = self.db_session.query(Genres).filter(Genres.movieId==id).all()
         # return genres
 
-    def get_laguage_movie_by_id(self, id):
-        movie = self.get_movie_by_id(id)
-        return movie.get_languages()
+    # def get_laguage_movie_by_id(self, id):
+    #     movie = self.get_movie_by_id(id)
+    #     return movie.get_languages()
         # languages = self.db_session.query(Languages).filter(Languages.movieId==id).all()
         # return languages
 
@@ -109,7 +110,7 @@ class Repository:
     def get_cartoon_movie(self, limit=12):
         # cartoons = self.db_session.query(Movie).join(Genres, Movie.movieId==Genres.movieId).filter(Genres.genre=='Animation').limit(limit).all()
         # return cartoons
-        cartoons = self.db_session.query(Movie).filter('Animation' in Movie.genres).limit(limit).all()
+        cartoons = self.db_session.query(Movie).filter(Movie.genres.contains('Animation')).limit(limit).all()
         return cartoons
 
 

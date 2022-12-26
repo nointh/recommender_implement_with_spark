@@ -20,3 +20,8 @@ docker-compose down --volumes --remove-orphans
 ```
 flask run
 ```
+
+to run sql
+```
+psql -h noing-db.c2qkku433l07.ap-southeast-1.rds.amazonaws.com -d postgres -U postgres -W
+```
