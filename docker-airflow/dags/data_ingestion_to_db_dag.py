@@ -82,7 +82,6 @@ def load_and_scrap_movie_data():
         fully_movie.loc[i, 'releaseDate'] = movie_data.get('releaseDate', '')
         fully_movie.loc[i, 'title'] = movie_data.get('title', '')
         fully_movie.loc[i, 'mpaa'] = movie_data.get('mpaa','')
-        fully_movie.loc[i, 'languages'] = '|'.join(movie_data.get('languages', []))
         fully_movie.loc[i, 'directors'] = '|'.join(movie_data.get('directors', []))
         fully_movie.loc[i, 'actors'] = '|'.join(movie_data.get('actors', []))
         # for genre in movie_data.get('genres', []):
@@ -130,12 +129,12 @@ def load_movie_data():
 
 def load_rating_data():
     ratings_df = pd.read_csv(f'{OUTPUT_FOlDER}/ratings.csv', sep=',')
-    ratings_df['timestamp'] = pd.to_datetime(ratings_df['timestamp'], unit='s')
+    # ratings_df['timestamp'] = pd.to_datetime(ratings_df['timestamp'], unit='s')
     ratings_df.to_sql('ratings', engine, if_exists='replace', index=False)
 
 def load_tag_data():
     tags_df = pd.read_csv(f'{OUTPUT_FOlDER}/tags.csv', sep=',')
-    tags_df['timestamp'] = pd.to_datetime(tags_df['timestamp'], unit='s')
+    # tags_df['timestamp'] = pd.to_datetime(tags_df['timestamp'], unit='s')
     tags_df.to_sql('tags', engine, if_exists='replace', index=False)
 
 default_args = {
