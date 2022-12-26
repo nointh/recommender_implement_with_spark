@@ -34,7 +34,7 @@ class Repository:
         else: return False
     
     def get_rating_by_user_movie(self, userId, movieId):
-        rating = self.db_session.query(Rating).filter(Rating.movieId == movieId and Rating.userId == userId)
+        rating = self.db_session.query(Rating).filter(Rating.movieId == movieId and Rating.userId == userId).first()
         if not rating:
             return None
         return rating

@@ -24,13 +24,15 @@ def detail(id):
     movie = repository.get_movie_by_id(id)
     if not movie:
         abort(404)
-    self_rating = repository.get_rating_by_user_movie(movieId=id, userId=session.get('user_id')) if session.get('user_id') else None
     rating = repository.get_average_rating_movie_by_id(id)
     genres = repository.get_genres_by_id(id)
     stars = repository.get_star_rating_movie_by_id(id)
     if session['user_id']:
+        self_rating = repository.get_rating_by_user_movie(movieId=id, userId=session.get('user_id')) if session.get('user_id') else None
+        pred_rating = repository.get_rating_predict(movieId=id, userId=session.get('user_id')) if session.get('user_id') else None
+
         recommend_movies = repository.get_movie_recommend_for_user(session['user_id'])
-        return render_template('detail.html', movie=movie, rating=rating, genres=genres, stars=stars, recommend_movies=recommend_movies, self_rating=self_rating)
+        return render_template('detail.html', movie=movie, rating=rating, genres=genres, stars=stars, recommend_movies=recommend_movies, self_rating=self_rating, pred_rating=pred_rating)
     return render_template('detail.html', movie=movie, rating=rating, genres=genres, stars=stars)
 
 
