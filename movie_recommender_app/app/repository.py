@@ -50,7 +50,8 @@ class Repository:
     def get_rating_predict(self, userId, movieId):
         sql_query = f'select predict from `sonorous-reach-371710.recommenders.mf_recommender` where user = {userId} and movie = {movieId} limit 1'
         query_job = self.bq_client.query(sql_query)
-        pred = query_job.result()[0][0]
+        for row in query_job.result():
+            pred = row[0]
         return pred
     
 
