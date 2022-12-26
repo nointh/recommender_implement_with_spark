@@ -42,15 +42,7 @@ PYSPARK_JOB = {
 
 engine = create_engine('postgresql+psycopg2://postgres:noi123456@noing-db.c2qkku433l07.ap-southeast-1.rds.amazonaws.com:5432/postgres')
 
-# def format_to_parquet(src_file):
-#     if not src_file.endswith('.csv'):
-#         logging.error("Can only accept source files in CSV format, for the moment")
-#         return
-#     table = pv.read_csv(src_file)
-#     pq.write_table(table, src_file.replace('.csv', '.parquet'))
 
-
-# NOTE: takes 20 mins, at an upload speed of 800kbps. Faster if your internet has a better upload speed
 def upload_to_gcs(bucket, object_name):
     """
     Ref: https://cloud.google.com/storage/docs/uploading-objects#storage-upload-object-python
@@ -59,11 +51,6 @@ def upload_to_gcs(bucket, object_name):
     :param local_file: source path & file-name
     :return:
     """
-    # WORKAROUND to prevent timeout for files > 6 MB on 800 kbps upload speed.
-    # (Ref: https://github.com/googleapis/python-storage/issues/74)
-    # storage.blob._MAX_MULTIPART_SIZE = 5 * 1024 * 1024  # 5 MB
-    # storage.blob._DEFAULT_CHUNKSIZE = 5 * 1024 * 1024  # 5 MB
-    # End of Workaround
     with engine.connect() as conn:
         result = conn.execute(text('select "userId", "movieId", "rating" from ratings'))
         ratings = result.all()
@@ -120,6 +107,7 @@ def load_factor_matrix_to_json(input, folder, bucket):
     # This is required if you are using service account and set true, 
     spark._jsc.hadoopConfiguration().set('fs.gs.auth.service.account.enable', 'true')
     spark._jsc.hadoopConfiguration().set('google.cloud.auth.service.account.json.keyfile', f"{GOOGLE_APPLICATION_CREDENTIALS}")
+    sc = spark.sparkContext
     client = storage.Client()
     bucket = client.bucket(bucket)
     # user_factor_matrix = sc.wholeTextFiles(input).values().map(json.loads)
@@ -128,13 +116,13 @@ def load_factor_matrix_to_json(input, folder, bucket):
     u_mapper = {val: key for key, val in u_mapper_r.items()}
     # print(u_mapper)
     user_df = spark.read.json(f'{input}user_matrix/*')
+    #processed_user_df =user_df.rdd.map(lambda x: ( u_mapper[x.user], x.array)).toDF(['user', 'array'])
     # user_df.printSchema()
     # user_df.show()
     user_rdd = user_df.select(col('user'), col('array')).rdd
     # print(user_rdd)
     # print(user_rdd.collect())
     user_factor_matrix = {u_mapper.get(row['user'], 0): row['array'] for row in user_rdd.collect()}
-    # print(user_factor_matrix)
 
     u_matrix_blob = bucket.blob(f'{folder}matrix/user_matrix.json')
     u_matrix_blob.upload_from_string(json.dumps(user_factor_matrix), 'application/json')
@@ -161,17 +149,20 @@ def load_factor_matrix_to_json(input, folder, bucket):
 
     final_u_matrix_blob = bucket.blob(f'models/matrix_factorization/user_matrix.json')
     final_u_matrix_blob.upload_from_string(json.dumps(user_factor_matrix), 'application/json')
-
-    #Calculate full matrix
-    full_predict_matrix = []
-    for user, user_arr in user_factor_matrix.items():
-        for movie, movie_arr in movie_factor_matrix.items():
-            pred = np.array(user_arr).dot(np.array(movie_arr).T)
-            full_predict_matrix.append((user, movie, pred))
-
-    recommender_blob = bucket.blob('recommenders/matrix_factorization.csv')
-    df = pd.DataFrame(full_predict_matrix, columns = ['userId', 'movieId', 'predict'])
-    recommender_blob.upload_from_string(df.to_csv(index=False), 'text/csv')
+    def pred(u_arr, m_arr):
+        return float(u_arr.dot(m_arr.T))
+    full_predict_rdd = sc.parallelize(list([(key, np.array(val)) for key, val in movie_factor_matrix.items()]))
+    full_predict_rdd = full_predict_rdd.flatMap(lambda u: [ (u[0], key, pred(u[1], np.array(val))) for key, val in movie_factor_matrix.items()])
+    # #Calculate full matrix
+    # full_predict_matrix = []
+    # for user, user_arr in user_factor_matrix.items():
+    #     for movie, movie_arr in movie_factor_matrix.items():
+    #         pred = np.array(user_arr).dot(np.array(movie_arr).T)
+    #         full_predict_matrix.append((user, movie, pred))
+    full_predict_rdd.toDF(['user','movie','predict']).write.option("header", True).mode('overwrite').csv(f'gs://{BUCKET}/recommenders/matrix_factorization')
+    # recommender_blob = bucket.blob('recommenders/matrix_factorization.csv')
+    # df = pd.DataFrame(full_predict_matrix, columns = ['userId', 'movieId', 'predict'])
+    # recommender_blob.upload_from_string(df.to_csv(index=False), 'text/csv')
 
 default_args = {
     "owner": "airflow",
@@ -249,7 +240,7 @@ with DAG(
             "externalDataConfiguration": {
                 'autodetect': 'True',
                 "sourceFormat": "CSV",
-                "sourceUris": [f"gs://{BUCKET}/recommenders/matrix_factorization.csv"],
+                "sourceUris": [f"gs://{BUCKET}/recommenders/matrix_factorization/*"],
             },
         },
     )

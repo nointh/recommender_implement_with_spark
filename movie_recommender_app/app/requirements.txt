@@ -1,4 +1,4 @@
 Flask
 sqlalchemy
 psycopg2-binary
-google-cloud-storage
+google-cloud-bigquery

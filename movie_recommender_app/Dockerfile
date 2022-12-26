@@ -34,7 +34,7 @@ RUN DOWNLOAD_URL="https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/goo
 # Copy over and install the requirements
 COPY ./app/requirements.txt /var/www/apache-flask/app/requirements.txt
 RUN pip install -r /var/www/apache-flask/app/requirements.txt
-RUN pip install --user  --upgrade google-cloud-storage
+RUN pip install --user  --upgrade google-cloud-bigquery
 # Copy over the apache configuration file and enable the site
 COPY ./apache-flask.conf /etc/apache2/sites-available/apache-flask.conf
 RUN a2ensite apache-flask

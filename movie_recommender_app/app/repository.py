@@ -1,10 +1,13 @@
 from sqlalchemy import create_engine, select, func, desc
 from sqlalchemy.orm import Session
 from app.models import User, Movie, Rating, Genres, Languages, Directors, Actors
+from google.cloud import bigquery
+
 class Repository:
     def __init__(self) -> None:
         self.engine = create_engine('postgresql+psycopg2://postgres:noi123456@noing-db.c2qkku433l07.ap-southeast-1.rds.amazonaws.com:5432/postgres')
         self.db_session = Session(self.engine)
+        self.bq_client = bigquery.Client()
 
     def login(self, username, password):
         current_user = self.db_session.query(User).filter(User.username==username and User.password==password).first()
