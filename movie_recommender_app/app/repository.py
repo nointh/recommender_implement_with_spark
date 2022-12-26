@@ -82,3 +82,14 @@ class Repository:
             result.append(tuple_temp)
         result.append(len(list_rating))
         return result
+    
+    def get_movie_recommend_for_user(self, user_id, limit=12):
+        client = bigquery.Client()
+
+        sql_query = f'select movie, predict from `sonorous-reach-371710.recommenders.mf_recommender` where user = {user_id} order by predict desc limit {limit}'
+        movies = []
+        query_job = client.query(sql_query)
+        for row in query_job.result():
+            movies.append(self.get_movie_by_id(row[0]))
+        return movies
+    

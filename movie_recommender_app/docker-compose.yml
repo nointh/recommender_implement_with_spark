@@ -3,7 +3,7 @@ services:
     web:
         build: .
         volumes:
-            - ~/.google/credentials/:/.google/credentials:ro
+            - /.google/credentials/:/.google/credentials:ro
         environment:
             GOOGLE_APPLICATION_CREDENTIALS: /.google/credentials/google_credentials.json
         ports:

@@ -174,7 +174,7 @@ default_args = {
 # NOTE: DAG declaration - using a Context Manager (an implicit way)
 with DAG(
     dag_id="process_matrix_factorization_model_dag",
-    schedule_interval="@daily",
+    schedule_interval="@hourly",
     default_args=default_args,
     catchup=False,
     max_active_runs=1,
