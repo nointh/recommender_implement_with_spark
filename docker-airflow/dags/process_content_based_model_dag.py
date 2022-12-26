@@ -189,6 +189,8 @@ def process_content_based_recommender():
     vectorizer = TfidfVectorizer()
     feature_vectors = vectorizer.fit_transform(combined_features)
     similarity = cosine_similarity(feature_vectors)
+
+
     
 default_args = {
     "owner": "airflow",
@@ -200,7 +202,7 @@ default_args = {
 # NOTE: DAG declaration - using a Context Manager (an implicit way)
 with DAG(
     dag_id="process_content_based_model_dag",
-    schedule_interval="@daily",
+    schedule_interval="@hourly",
     default_args=default_args,
     catchup=False,
     max_active_runs=1,

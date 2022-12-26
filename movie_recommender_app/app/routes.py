@@ -41,7 +41,7 @@ def rate(movie):
     repository = Repository()
     if not session['user_id']:
         return redirect('/login')
-    new_rating = request.form.get('rating')
+    new_rating = float(request.form.get('rating'))
     userId = session['user_id']
     movieId = movie
     rating = repository.get_rating_object_by_user_movie(userId=userId, movieId=movieId)
