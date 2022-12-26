@@ -9,7 +9,7 @@ from app.repository import Repository
 def index():
     repository = Repository()
     movies = repository.get_movies(limit=12)
-    top_rating_movies = repository.get_top_rating_movie(limit=12)
+    top_rating_movies = repository.get_top_rating_movies(limit=12)
     latest_movies = repository.get_latest_movies(limit=12)
     cartoons = repository.get_cartoon_movie(limit=12)
     return render_template('index.html', movies=movies, top_rating_movies=top_rating_movies, latest_movies=latest_movies, cartoons=cartoons)
@@ -34,7 +34,6 @@ def detail(id):
         recommend_movies = repository.get_movie_recommend_for_user(session['user_id'])
         return render_template('detail.html', movie=movie, rating=rating, genres=genres, stars=stars, recommend_movies=recommend_movies, self_rating=self_rating, pred_rating=pred_rating)
     return render_template('detail.html', movie=movie, rating=rating, genres=genres, stars=stars)
-
 
 @app.route('/rate/<int:movie>', methods=['POST'])
 def rate(movie):

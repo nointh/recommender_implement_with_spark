@@ -33,7 +33,6 @@ class Movie(Base):
     def get_actors(self):
         return self.actors.split('|')
 
-
 class Rating(Base):
     __tablename__ = 'ratings'
     movieId = Column(Integer, primary_key=True)

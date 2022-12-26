@@ -66,9 +66,9 @@ class Repository:
         self.db_session.commit()
         return True
 
-    def get_top_rating_movie(self, limit=12):
+    def get_top_rating_movies(self, limit=12):
         #get top rating movieID and average rating --> list[(movieId,avgRating),...]
-        top_rating_moiveID = self.db_session.query(Rating.movieId, func.avg(Rating.rating).label('avgRating'),).group_by(Rating.movieId).order_by(desc('avgRating')).limit(limit).all()
+        top_rating_moiveID = self.db_session.query(Rating.movieId, func.avg(Rating.rating).label('avgRating')).group_by(Rating.movieId).having(func.count(Rating.rating) > 150).order_by(desc('avgRating')).limit(limit).all()
         movies = []
         for i in top_rating_moiveID:
             movies.append(self.get_movie_by_id(i.movieId))
