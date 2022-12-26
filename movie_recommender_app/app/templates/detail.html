@@ -53,18 +53,19 @@
                         {% for genre in genres %}
                            <a href="" rel="category tag">{{genre.genre}}, </a>
                         {% endfor %}
-                        </li>
+                     </li>
                      <li class="list-info-group-item"><span>Language</span> : <a href="" rel="tag">Mỹ</a></li>
-                     <li class="list-info-group-item"><span>Director</span> : <a class="director" rel="nofollow"
-                           href="https://phimhay.co/dao-dien/cate-shortland" title="James Cameron">James Cameron</a>
+                     <li class="list-info-group-item">
+                        <span>Director</span> : 
+                           <a class="director" rel="nofollow" href="" title="">{{movie.directors}}</a>
                      </li>
                      <li class="list-info-group-item last-item"
                         style="-overflow: hidden;-display: -webkit-box;-webkit-line-clamp: 1;-webkit-box-flex: 1;-webkit-box-orient: vertical;">
-                        <span>Actor</span> : <a href="" rel="nofollow" title="Sam Worthington">Sam Worthington</a>,
-                        <a href="" rel="nofollow" title="Zoe Saldaña">Zoe Saldaña</a>, <a href="" rel="nofollow"
-                           title="Stephen Lang">Stephen Lang</a>, <a href="" rel="nofollow"
-                           title="Sigourney Weaver">Sigourney Weaver</a>, <a href="" rel="nofollow"
-                           title="Kate Winslet">Kate Winslet</a></li>
+                        <span>Actor</span> : 
+                        {% for actor in actors %}
+                           <a href="" rel="nofollow" title="">{{actor.actor}}, </a>
+                        {% endfor %}  
+                     </li>
                   </ul>
                   <div class="movie-trailer hidden"></div>
                </div>
@@ -87,7 +88,6 @@
                      <li></li>
                      <li></li>
                      <li></li>
-
                   </ul>
                </article>
             </div>

@@ -18,6 +18,7 @@ class Movie(Base):
     releaseDate = Column(String)
     posterPath = Column(String)
     mpaa = Column(String)
+    directors = Column(String)
 
 class Rating(Base):
     __tablename__ = 'ratings'
