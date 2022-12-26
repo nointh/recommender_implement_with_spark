@@ -276,10 +276,30 @@
    <section class="related-movies">
       <div id="halim_related_movies-2xx" class="wrap-slider">
          <div class="section-bar clearfix">
-            <h3 class="section-title"><span>CÓ THỂ BẠN MUỐN XEM</span></h3>
+            <h3 class="section-title"><span>Recommended movie by your ratings</span></h3>
          </div>
          <div id="halim_related_movies-2" class="owl-carousel owl-theme related-film">
+            {% for movie in recommend_movies %}
             <article class="thumb grid-item post-38498">
+               <div class="halim-item">
+                  <a class="halim-thumb" href="chitiet.html" title="{{ movie.title }}">
+                     <figure><img class="lazy img-responsive"
+                           src="https://image.tmdb.org/t/p/w200{{movie.posterPath}}"
+                           alt="{{movie.title}}" title="{{ movie.title }}"></figure>
+                     <span class="status">HD</span><span class="episode"><i class="fa fa-play"
+                           aria-hidden="true"></i>Vietsub</span>
+                     <div class="icon_overlay"></div>
+                     <div class="halim-post-title-box">
+                        <div class="halim-post-title ">
+                           <p class="entry-title">{{ movie.title }}</p>
+                           <p class="original_title">{{ movie.title }}</p>
+                        </div>
+                     </div>
+                  </a>
+               </div>
+            </article>
+            {% endfor %}
+            <!-- <article class="thumb grid-item post-38498">
                <div class="halim-item">
                   <a class="halim-thumb" href="chitiet.html" title="Đại Thánh Vô Song">
                      <figure><img class="lazy img-responsive"
@@ -350,25 +370,7 @@
                      </div>
                   </a>
                </div>
-            </article>
-            <article class="thumb grid-item post-38498">
-               <div class="halim-item">
-                  <a class="halim-thumb" href="chitiet.html" title="Đại Thánh Vô Song">
-                     <figure><img class="lazy img-responsive"
-                           src="https://images2-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&gadget=a&no_expand=1&refresh=604800&url=https://1.bp.blogspot.com/-w860_-tiHFI/YO7DW5hwmNI/AAAAAAAAJqg/yFXRsVIh70oslGUKU4Fg3NxipcmCiPt3ACLcBGAsYHQ/s320/unnamed.jpg"
-                           alt="Đại Thánh Vô Song" title="Đại Thánh Vô Song"></figure>
-                     <span class="status">HD</span><span class="episode"><i class="fa fa-play"
-                           aria-hidden="true"></i>Vietsub</span>
-                     <div class="icon_overlay"></div>
-                     <div class="halim-post-title-box">
-                        <div class="halim-post-title ">
-                           <p class="entry-title">Đại Thánh Vô Song</p>
-                           <p class="original_title">Monkey King: The One And Only</p>
-                        </div>
-                     </div>
-                  </a>
-               </div>
-            </article>
+            </article> -->
 
          </div>
          <script>
