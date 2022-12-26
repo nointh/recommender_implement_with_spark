@@ -52,7 +52,7 @@ def get_themoviedb_data(id):
     movie_data['plotSummary'] = movie_data.get('overview', '')
     movie_data['releaseDate'] = movie_data.get('release_date', '')
     movie_data['posterPath'] = movie_data.get('poster_path', '')
-    movie_data['languages'] = movie_data.get('spoken_languages', '')
+    movie_data['languages'] = movie_data.get('spoken_languages', [])
     movie_data['genres'] = map(lambda x: x.get('name', ''), movie_data.get('genres', []))
     movie_data['releaseYear'] = movie_data.get('release_date', '')[:4]
     return movie_data
@@ -82,19 +82,24 @@ def load_and_scrap_movie_data():
         fully_movie.loc[i, 'releaseDate'] = movie_data.get('releaseDate', '')
         fully_movie.loc[i, 'title'] = movie_data.get('title', '')
         fully_movie.loc[i, 'mpaa'] = movie_data.get('mpaa','')
-        for genre in movie_data.get('genres', []):
-            genre_df = genre_df.append({'movieId': movie_id, 'genre': genre}, ignore_index=True)
-        for language in movie_data.get('languages', []):
-            language_df = language_df.append({'movieId': movie_id, 'language': language}, ignore_index=True)
-        for director in movie_data.get('directors', []):
-            director_df = director_df.append({'movieId': movie_id, 'director': director}, ignore_index=True)
-        for actor in movie_data.get('actors', []):
-            actor_df = actor_df.append({'movieId': movie_id, 'actor': actor}, ignore_index=True)
+        fully_movie.loc[i, 'directors'] = '|'.join(movie_data.get('directors', []))
+        fully_movie.loc[i, 'actors'] = '|'.join(movie_data.get('actors', []))
+        # for genre in movie_data.get('genres', []):
+        #     genre_df = genre_df.append({'movieId': movie_id, 'genre': genre}, ignore_index=True)
+        # for language in movie_data.get('languages', []):
+        #     language_df = language_df.append({'movieId': movie_id, 'language': language}, ignore_index=True)
+        # for director in movie_data.get('directors', []):
+        #     director_df = director_df.append({'movieId': movie_id, 'director': director}, ignore_index=True)
+        # for actor in movie_data.get('actors', []):
+        #     actor_df = actor_df.append({'movieId': movie_id, 'actor': actor}, ignore_index=True)
     fully_movie.to_sql('movies', engine, if_exists='replace', index=False)
-    genre_df.to_sql('genres', engine, if_exists='replace', index=False)
-    language_df.to_sql('languages', engine, if_exists='replace', index=False)
-    director_df.to_sql('directors', engine, if_exists='replace', index=False)
-    actor_df.to_sql('actors', engine, if_exists='replace', index=False)
+    # genre_df.to_sql('genres', engine, if_exists='replace', index=False)
+    # language_df.to_sql('languages', engine, if_exists='replace', index=False)
+    # director_df.to_sql('directors', engine, if_exists='replace', index=False)
+    # actor_df.to_sql('actors', engine, if_exists='replace', index=False)
+    # print(language_df.head(5))
+    # print(director_df.head(5))
+    # print(actor_df.head(5))
 
 def generate_users_data():
     ratings_df = pd.read_csv(f'{OUTPUT_FOlDER}/ratings.csv', sep=',')
@@ -124,12 +129,12 @@ def load_movie_data():
 
 def load_rating_data():
     ratings_df = pd.read_csv(f'{OUTPUT_FOlDER}/ratings.csv', sep=',')
-    ratings_df['timestamp'] = pd.to_datetime(ratings_df['timestamp'], unit='s')
+    # ratings_df['timestamp'] = pd.to_datetime(ratings_df['timestamp'], unit='s')
     ratings_df.to_sql('ratings', engine, if_exists='replace', index=False)
 
 def load_tag_data():
     tags_df = pd.read_csv(f'{OUTPUT_FOlDER}/tags.csv', sep=',')
-    tags_df['timestamp'] = pd.to_datetime(tags_df['timestamp'], unit='s')
+    # tags_df['timestamp'] = pd.to_datetime(tags_df['timestamp'], unit='s')
     tags_df.to_sql('tags', engine, if_exists='replace', index=False)
 
 default_args = {

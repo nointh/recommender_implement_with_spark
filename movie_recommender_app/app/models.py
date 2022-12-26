@@ -18,7 +18,20 @@ class Movie(Base):
     releaseDate = Column(String)
     posterPath = Column(String)
     mpaa = Column(String)
+    languages = Column(String)
     directors = Column(String)
+    actors = Column(String)
+    genres = Column(String)
+    
+    def get_languages(self):
+        return self.languages.split('|')
+
+    def get_genres(self):
+        return self.genres.split('|')
+    def get_directors(self):
+        return self.directors.split('|')
+    def get_actors(self):
+        return self.actors.split('|')
 
 class Rating(Base):
     __tablename__ = 'ratings'

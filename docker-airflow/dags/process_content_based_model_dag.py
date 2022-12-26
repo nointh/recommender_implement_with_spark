@@ -1,11 +1,15 @@
 import os
 import logging
+import numpy as np
+import difflib
 
 from airflow import DAG
 from airflow.utils.dates import days_ago
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
-
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 from google.cloud import storage
 from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateExternalTableOperator
 from airflow.providers.google.cloud.operators.dataproc import DataprocSubmitJobOperator
@@ -23,7 +27,7 @@ BUCKET = os.environ.get("GCP_GCS_BUCKET")
 CLUSTER_NAME = os.environ.get("GCP_CLUSTER_NAME", 'hadoopcluster')
 PYSPARK_URI = 'gs://movie_recommenders/pyspark_jobs/mf.py'
 path_to_local_home = os.environ.get("AIRFLOW_HOME", "/opt/airflow/")
-BIGQUERY_DATASET = os.environ.get("BIGQUERY_DATASET", 'factor_matrix')
+BIGQUERY_DATASET = os.environ.get("BIGQUERY_DATASET", 'recommenders')
 EXECUTION_TIME = "{{ dag_run.logical_date | ts_nodash }}"
 GOOGLE_APPLICATION_CREDENTIALS  = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", '/.google/credentials/google_credentials.json')
 PYSPARK_JOB = {
@@ -122,15 +126,15 @@ def load_factor_matrix_to_json(input, folder, bucket):
     u_mapper_blob = bucket.blob(f'{folder}processed/user_dict.json')
     u_mapper_r = json.loads(u_mapper_blob.download_as_string())
     u_mapper = {val: key for key, val in u_mapper_r.items()}
-    print(u_mapper)
+    # print(u_mapper)
     user_df = spark.read.json(f'{input}user_matrix/*')
-    user_df.printSchema()
-    user_df.show()
+    # user_df.printSchema()
+    # user_df.show()
     user_rdd = user_df.select(col('user'), col('array')).rdd
-    print(user_rdd)
-    print(user_rdd.collect())
+    # print(user_rdd)
+    # print(user_rdd.collect())
     user_factor_matrix = {u_mapper.get(row['user'], 0): row['array'] for row in user_rdd.collect()}
-    print(user_factor_matrix)
+    # print(user_factor_matrix)
 
     u_matrix_blob = bucket.blob(f'{folder}matrix/user_matrix.json')
     u_matrix_blob.upload_from_string(json.dumps(user_factor_matrix), 'application/json')
@@ -139,19 +143,55 @@ def load_factor_matrix_to_json(input, folder, bucket):
     m_mapper_blob = bucket.blob(f'{folder}processed/movie_dict.json')
     m_mapper_r = json.loads(m_mapper_blob.download_as_string())
     m_mapper = {val: key for key, val in m_mapper_r.items()}
-    print(m_mapper)
+    # print(m_mapper)
     movie_df = spark.read.json(f'{input}movie_matrix/*')
     movie_df.printSchema()
     movie_df.show()
     movie_rdd = movie_df.select(col('movie'), col('array')).rdd
-    print(movie_rdd)
-    print(movie_rdd.collect())
+    # print(movie_rdd)
+    # print(movie_rdd.collect())
     movie_factor_matrix = {m_mapper.get(row['movie'], 0): row['array'] for row in movie_rdd.collect()}
-    print(movie_factor_matrix)
+    # print(movie_factor_matrix)
 
     m_matrix_blob = bucket.blob(f'{folder}matrix/movie_matrix.json')
     m_matrix_blob.upload_from_string(json.dumps(movie_factor_matrix), 'application/json')
+    
+    final_m_matrix_blob = bucket.blob(f'models/matrix_factorization/movie_matrix.json')
+    final_m_matrix_blob.upload_from_string(json.dumps(movie_factor_matrix), 'application/json')
 
+    final_u_matrix_blob = bucket.blob(f'models/matrix_factorization/user_matrix.json')
+    final_u_matrix_blob.upload_from_string(json.dumps(user_factor_matrix), 'application/json')
+
+    #Calculate full matrix
+    full_predict_matrix = []
+    for user, user_arr in user_factor_matrix.items():
+        for movie, movie_arr in movie_factor_matrix.items():
+            pred = np.array(user_arr).dot(np.array(movie_arr).T)
+            full_predict_matrix.append((user, movie, pred))
+
+    recommender_blob = bucket.blob('recommenders/matrix_factorization.csv')
+    df = pd.DataFrame(full_predict_matrix, columns = ['userId', 'movieId', 'predict'])
+    recommender_blob.upload_from_string(df.to_csv(index=False), 'text/csv')
+
+def process_content_based_recommender():
+    with engine.connect() as conn:
+        result = conn.execute(text('select * from movies'))
+        movies = result.all()
+    movies_data = pd.DataFrame(movies)
+    genres = movies_data['genres'].str.split('|')
+    for i in range(len(genres)):
+        genres[i] = ' '.join(map(str, genres[i]))
+    movies_data['genres'] = genres
+    selected_features = ['genres','mpaa']
+    for feature in selected_features:
+        movies_data[feature] = movies_data[feature].fillna('')
+    combined_features = movies_data['genres']+' '+movies_data['mpaa']
+    vectorizer = TfidfVectorizer()
+    feature_vectors = vectorizer.fit_transform(combined_features)
+    similarity = cosine_similarity(feature_vectors)
+
+
+    
 default_args = {
     "owner": "airflow",
     "start_date": days_ago(1),
@@ -161,8 +201,8 @@ default_args = {
 
 # NOTE: DAG declaration - using a Context Manager (an implicit way)
 with DAG(
-    dag_id="process_model_dag",
-    schedule_interval="@daily",
+    dag_id="process_content_based_model_dag",
+    schedule_interval="@hourly",
     default_args=default_args,
     catchup=False,
     max_active_runs=1,
@@ -202,14 +242,14 @@ with DAG(
     )
 
     submit_job_task = DataprocSubmitJobOperator(
-        task_id='submit_job_task',
+        task_id='submit_matrix_factorization_job_task',
         job=PYSPARK_JOB,
         region='us-central1',
         project_id=PROJECT_ID
     )
 
     load_matrix_as_json_task = PythonOperator(
-        task_id="load_matrix_as_json",
+        task_id="load_matrix_to_gcs",
         python_callable=load_factor_matrix_to_json,
         op_kwargs={
             "bucket": BUCKET,
@@ -217,20 +257,21 @@ with DAG(
             "folder": f"{EXECUTION_TIME}/"
         },
     )
-    # bigquery_external_table_task = BigQueryCreateExternalTableOperator(
-    #     task_id="bigquery_external_table_task",
-    #     table_resource={
-    #         "tableReference": {
-    #             "projectId": PROJECT_ID,
-    #             "datasetId": BIGQUERY_DATASET,
-    #             "tableId": "external_table",
-    #         },
-    #         "externalDataConfiguration": {
-    #             "sourceFormat": "PARQUET",
-    #             "sourceUris": [f"gs://{BUCKET}/raw/{dataset_file}"],
-    #         },
-    #     },
-    # )
+    bigquery_external_table_task = BigQueryCreateExternalTableOperator(
+        task_id="create_mf_bigquery_external_table_task",
+        table_resource={
+            "tableReference": {
+                "projectId": PROJECT_ID,
+                "datasetId": BIGQUERY_DATASET,
+                "tableId": "mf_recommender",
+            },
+            "externalDataConfiguration": {
+                'autodetect': 'True',
+                "sourceFormat": "CSV",
+                "sourceUris": [f"gs://{BUCKET}/recommenders/matrix_factorization.csv"],
+            },
+        },
+    )
 
 
     # gcs_2_bq_ext = BigQueryCreateExternalTableOperator(
@@ -249,5 +290,5 @@ with DAG(
     #     }
     # )
 
-    retrieve_data_task >> preprocess_data_task >> submit_job_task >> load_matrix_as_json_task
+    retrieve_data_task >> preprocess_data_task >> submit_job_task >> load_matrix_as_json_task >> bigquery_external_table_task
     # download_dataset_task  >> local_to_gcs_task >> bigquery_external_table_task

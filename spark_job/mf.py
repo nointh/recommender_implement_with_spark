@@ -365,9 +365,9 @@ if __name__ == '__main__':
     parser.add_argument('--input', default='gs://movie_recommenders/20221218T143829/processed/ratings.csv')
     parser.add_argument('--output', default='gs://movie_recommenders/20221218T143829/model/')
     parser.add_argument('--model', default='sgd')
-    parser.add_argument('--stepsize', type=float, default=0.01)
+    parser.add_argument('--stepsize', type=float, default=0.005)
     parser.add_argument('--maxiter', type=int, default=0)
-    parser.add_argument('--lambd', type=float, default=1)
+    parser.add_argument('--lambd', type=float, default=0.1)
     parser.add_argument('--numfactor', type=float, default=10)
 
     args = parser.parse_args()
