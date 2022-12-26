@@ -32,6 +32,32 @@ class Repository:
         if result:
             return True
         else: return False
+    
+    def get_rating_by_user_movie(self, userId, movieId):
+        rating = self.db_session.query(Rating).filter(Rating.movieId == movieId and Rating.userId == userId)
+        if not rating:
+            return None
+        return rating
+    
+    def add_rating(self, userId, movieId, rating):
+        rating = Rating(userId=userId, movieId=movieId, rating=rating)
+        result = self.db_session.add(rating)
+        self.db_session.commit()
+        if result:
+            return True
+        else: return False
+
+    def get_rating_predict(self, userId, movieId):
+        sql_query = f'select predict from `sonorous-reach-371710.recommenders.mf_recommender` where user = {userId} and movie = {movieId} limit 1'
+        query_job = self.bq_client.query(sql_query)
+        pred = query_job.result()[0][0]
+        return pred
+    
+
+    def update_rating(self, rating: Rating, new_rating):
+        rating.rating = new_rating
+        self.db_session.commit()
+        return True
 
     def get_top_rating_movie(self, limit=12):
         #get top rating movieID and average rating --> list[(movieId,avgRating),...]
@@ -84,11 +110,11 @@ class Repository:
         return result
     
     def get_movie_recommend_for_user(self, user_id, limit=12):
-        client = bigquery.Client()
+        
 
         sql_query = f'select movie, predict from `sonorous-reach-371710.recommenders.mf_recommender` where user = {user_id} order by predict desc limit {limit}'
         movies = []
-        query_job = client.query(sql_query)
+        query_job = self.bq_client.query(sql_query)
         for row in query_job.result():
             movies.append(self.get_movie_by_id(row[0]))
         return movies

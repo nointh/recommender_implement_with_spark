@@ -29,32 +29,40 @@
                      {{movie.title}}</h1>
                   <h2 class="movie-title title-2" style="font-size: 12px;"></h2>
                   <ul class="list-info-group">
-                     <li class="list-info-group-item"><span>Trạng Thái</span> : <span class="quality">HD</span><span
+                     <li class="list-info-group-item"><span>Status</span> : <span class="quality">HD</span><span
                            class="episode">Vietsub</span></li>
                      <li class="list-info-group-item">
-                        <span>Rating</span> : <span class="imdb">{{rating}}/5.0</span>
+                        <span>Average rating</span> : <span class="imdb"> {{rating}}/5.0 </span>
                         <!-- Rating -->
+                        {% if self_rating %}
+                        Your rating/Our predict: <span class="imdb"> {{self_rating}}/5.0 </span>
+                        {% endif %}
                         <button style="color: black; background: #FFC007" class="open-button" onclick="openForm()">Rate</button>
-
+                        
                         <div id="id01" class="modal">
-                           <form class="modal-content animate" action="#" method="post">
+                           <form class="modal-content animate" action="/rate" method="post">
                               <label style="margin: 10px 0 0 10px; color: black; text-shadow: none;" for="vol">Ratings</label>
                               <div style="display: flex; margin: 0 10px 0" class="slider">
                                  <input class="in-range" type="range" min="0" max="5" value="4">
                                  <div style="color: black; text-shadow: none; margin-left: 5px" class="value">5</div>
                               </div>
-                              <input class="btn-submit-rate" type="submit" onclick="alert('Ok nha!')">
+                              <input class="btn-submit-rate" type="submit" onclick="alert('Thank you for ratings!')">
                            </form>
                         </div>
                         <!-- Genres -->
                      </li>
+                     {% if self_rating %}
+                     <li class="list-info-group-item">
+
+                     </li>
+                     {% endif %}
                      <li class="list-info-group-item">
                         <span>Genre</span> :
                         {% for genre in genres %}
                            <a href="" rel="category tag">{{genre.genre}}, </a>
                         {% endfor %}
                         </li>
-                     <li class="list-info-group-item"><span>Language</span> : <a href="" rel="tag">Mỹ</a></li>
+                     <li class="list-info-group-item"><span>Language</span> : <a href="" rel="tag">ENGLISH</a></li>
                      <li class="list-info-group-item"><span>Director</span> : <a class="director" rel="nofollow"
                            href="https://phimhay.co/dao-dien/cate-shortland" title="James Cameron">James Cameron</a>
                      </li>
@@ -74,7 +82,7 @@
          <div id="halim_trailer"></div>
          <div class="clearfix"></div>
          <div class="section-bar clearfix">
-            <h2 class="section-title"><span style="color:#ffed4d">Nội dung phim</span></h2>
+            <h2 class="section-title"><span style="color:#ffed4d">Plot summary</span></h2>
          </div>
          <div class="entry-content htmlwrap clearfix">
             <div class="video-item halim-entry-box">
@@ -282,7 +290,7 @@
             {% for movie in recommend_movies %}
             <article class="thumb grid-item post-38498">
                <div class="halim-item">
-                  <a class="halim-thumb" href="chitiet.html" title="{{ movie.title }}">
+                  <a class="halim-thumb" href="detail/{{ movie.movieId }}" title="{{ movie.title }}">
                      <figure><img class="lazy img-responsive"
                            src="https://image.tmdb.org/t/p/w200{{movie.posterPath}}"
                            alt="{{movie.title}}" title="{{ movie.title }}"></figure>

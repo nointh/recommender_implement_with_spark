@@ -24,14 +24,31 @@ def detail(id):
     movie = repository.get_movie_by_id(id)
     if not movie:
         abort(404)
-    
+    self_rating = repository.get_rating_by_user_movie(movieId=id, userId=session.get('user_id')) if session.get('user_id') else None
     rating = repository.get_average_rating_movie_by_id(id)
     genres = repository.get_genres_by_id(id)
     stars = repository.get_star_rating_movie_by_id(id)
     if session['user_id']:
         recommend_movies = repository.get_movie_recommend_for_user(session['user_id'])
-        return render_template('detail.html', movie=movie, rating=rating, genres=genres, stars=stars, recommend_movies=recommend_movies)
+        return render_template('detail.html', movie=movie, rating=rating, genres=genres, stars=stars, recommend_movies=recommend_movies, self_rating=self_rating)
     return render_template('detail.html', movie=movie, rating=rating, genres=genres, stars=stars)
+
+
+@app.route('/rate/<int:movie>', method=['POST'])
+def rate(movie):
+    repository = Repository()
+    if not session['user_id']:
+        return redirect('/login')
+    new_rating = request.form.get('rating')
+    userId = session['user_id']
+    movieId = movie
+    rating = repository.get_rating_by_user_movie(userId=userId, movieId=movieId)
+    if rating:
+        repository.update_rating(rating=rating, new_rating=new_rating)
+    else:
+        repository.add_rating(userId=userId, movieId=movieId, rating=new_rating)
+    return redirect(f'/detail/{movie}')
+
 
 @app.route('/category')
 def category():
