@@ -34,7 +34,7 @@ def detail(id):
     return render_template('detail.html', movie=movie, rating=rating, genres=genres, stars=stars)
 
 
-@app.route('/rate/<int:movie>', method=['POST'])
+@app.route('/rate/<int:movie>', methods=['POST'])
 def rate(movie):
     repository = Repository()
     if not session['user_id']:
