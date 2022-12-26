@@ -35,12 +35,12 @@
                         <span>Average rating</span> : <span class="imdb"> {{rating}}/5.0 </span>
                         <!-- Rating -->
                         {% if self_rating %}
-                        Your rating/Our predict: <span class="imdb"> {{self_rating}}/{{pred_rating | float}} </span>
+                        Your rating/Our predict: <span class="imdb"> {{self_rating}}/{{ "0.2f" % pred_rating|float }} </span>
                         {% endif %}
                         <button style="color: black; background: #FFC007" class="open-button" onclick="openForm()">Rate</button>
                         
                         <div id="id01" class="modal">
-                           <form class="modal-content animate" action="/rate" method="post">
+                           <form class="modal-content animate" action="/rate/{{movie.movieId}}" method="post">
                               <label style="margin: 10px 0 0 10px; color: black; text-shadow: none;" for="vol">Ratings</label>
                               <div style="display: flex; margin: 0 10px 0" class="slider">
                                  <input class="in-range" type="range" min="0" max="5" value="4">
