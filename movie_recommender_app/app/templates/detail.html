@@ -35,7 +35,7 @@
                         <span>Average rating</span> : <span class="imdb"> {{rating}}/5.0 </span>
                         <!-- Rating -->
                         {% if self_rating %}
-                        Your rating/Our predict: <span class="imdb"> {{self_rating}}/{{ "0.2f" % pred_rating|float }} </span>
+                        Your rating/Our predict: <span class="imdb"> {{self_rating}}/{{ "%.2f"|format(pred_rating) }} </span>
                         {% endif %}
                         <button style="color: black; background: #FFC007" class="open-button" onclick="openForm()">Rate</button>
                         
