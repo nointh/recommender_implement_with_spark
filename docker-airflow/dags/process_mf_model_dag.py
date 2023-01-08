@@ -151,7 +151,7 @@ def load_factor_matrix_to_json(input, folder, bucket):
     final_u_matrix_blob.upload_from_string(json.dumps(user_factor_matrix), 'application/json')
     def pred(u_arr, m_arr):
         return float(u_arr.dot(m_arr.T))
-    full_predict_rdd = sc.parallelize(list([(key, np.array(val)) for key, val in movie_factor_matrix.items()]))
+    full_predict_rdd = sc.parallelize(list([(key, np.array(val)) for key, val in user_factor_matrix.items()]))
     full_predict_rdd = full_predict_rdd.flatMap(lambda u: [ (u[0], key, pred(u[1], np.array(val))) for key, val in movie_factor_matrix.items()])
     # #Calculate full matrix
     # full_predict_matrix = []
